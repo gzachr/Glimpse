@@ -85,6 +85,7 @@
         android:layout_marginTop="92dp"
         android:layout_marginBottom="80dp"
         android:background="@drawable/rounded_button"
+        android:backgroundTint="@color/primary_purple"
         android:fontFamily="@font/poppins_semibold"
         android:text="Login"
         android:textAllCaps="false"

@@ -11,5 +11,6 @@
     <color name="grey">#6A6767</color>
 
     <color name="primary_purple">#B3A4f3</color>
+    <color name="primary_dark">#2A2929</color>
 
 </resources>
