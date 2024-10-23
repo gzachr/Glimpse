@@ -25,7 +25,7 @@
             android:background="@drawable/rounded_button"
             android:backgroundTint="@color/primary_dark"
             android:scaleType="center"
-            tools:srcCompat="@drawable/profile_icon" />
+            android:src="@drawable/profile_icon" />
 
         <Button
             android:id="@+id/friendsBtn"
@@ -52,7 +52,7 @@
             android:background="@drawable/rounded_button"
             android:backgroundTint="@color/primary_dark"
             android:scaleType="center"
-            tools:srcCompat="@drawable/message_icon" />
+            android:src="@drawable/notification_icon" />
     </LinearLayout>
 
     <androidx.cardview.widget.CardView
@@ -60,7 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        app:cardCornerRadius="20dp"
+        app:cardCornerRadius="65dp"
         app:cardElevation="0dp">
 
 
@@ -83,7 +83,7 @@
             android:id="@+id/captureBtn"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:background="@drawable/circle_button"
+            android:background="@drawable/circle_button_purple_outline"
             android:padding="10dp" />
     </LinearLayout>
 
@@ -95,7 +95,7 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/viewFeedBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#00FFFFFF"
