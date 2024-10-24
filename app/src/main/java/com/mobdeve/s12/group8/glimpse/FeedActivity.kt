@@ -22,7 +22,13 @@ class FeedActivity: AppCompatActivity() {
 
     private val newIntentActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
-            print("hi")
+            val data = result.data
+            val position = data?.getIntExtra("position", -1)
+            position?.let {
+                if (position >= 0) {
+                    recyclerView.scrollToPosition(position)
+                }
+            }
         }
     }
 
