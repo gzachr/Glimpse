@@ -50,9 +50,17 @@ class HomeActivity: AppCompatActivity() {
         })
 
         // switch camera on double tap
-        binding.previewView.setOnTouchListener { view, motionEvent ->
+        binding.previewView.setOnTouchListener { _, motionEvent ->
             gestureDetector.onTouchEvent(motionEvent)
             true
+        }
+
+        binding.captureBtn.setOnClickListener {
+            /**
+             * TODO logic for capturing photo
+             */
+
+            startActivity(Intent(applicationContext, PostActivity::class.java))
         }
 
         startCamera()

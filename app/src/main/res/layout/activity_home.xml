@@ -17,7 +17,7 @@
         android:paddingEnd="5dp">
 
         <ImageButton
-            android:id="@+id/profileBtn"
+            android:id="@+id/postExitBtn"
             android:layout_width="1dp"
             android:layout_height="50dp"
             android:layout_marginEnd="30dp"
@@ -44,7 +44,7 @@
             android:textSize="18sp" />
 
         <ImageButton
-            android:id="@+id/messageBtn"
+            android:id="@+id/emptyBtn"
             android:layout_width="1dp"
             android:layout_height="50dp"
             android:layout_marginStart="30dp"
@@ -83,7 +83,7 @@
             android:id="@+id/captureBtn"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:background="@drawable/circle_button_purple_outline"
+            android:background="@drawable/circle_button_purple_outline_white_fill"
             android:padding="10dp" />
     </LinearLayout>
 

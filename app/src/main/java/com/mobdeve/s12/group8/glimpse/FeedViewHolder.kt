@@ -66,7 +66,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                 }
             })
 
-        binding.feedCv.setOnTouchListener { view, motionEvent ->
+        binding.feedCv.setOnTouchListener { _, motionEvent ->
             gestureDetector.onTouchEvent(motionEvent)
             true
         }
