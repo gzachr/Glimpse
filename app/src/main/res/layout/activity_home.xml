@@ -35,7 +35,7 @@
             android:background="@drawable/rounded_button"
             android:backgroundTint="@color/primary_dark"
             android:drawableStart="@drawable/friends_icon"
-            android:drawablePadding="-40dp"
+            android:drawablePadding="-50dp"
             android:paddingStart="50dp"
             android:paddingEnd="7dp"
             android:text="Friends"

@@ -51,7 +51,7 @@ class FeedActivity: AppCompatActivity() {
         }
 
         binding.feedReturnToHomeBtn.setOnClickListener {
-            //TODO return to home activity, remove this activity from stack?
+            finish()
         }
 
     }
