@@ -1,12 +1,23 @@
 package com.mobdeve.s12.group8.glimpse
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.recyclerview.widget.RecyclerView
+import com.mobdeve.s12.group8.glimpse.model.Post
 
-class GalleryAdapter(private val postList: List<Int>) : RecyclerView.Adapter<GalleryAdapter.PostViewHolder>() {
+class GalleryAdapter(
+    private val postList: ArrayList<Post>,
+    private val listener: OnPostClickListener
+) : RecyclerView.Adapter<GalleryAdapter.PostViewHolder>() {
+
+    interface OnPostClickListener {
+        fun onPostClick(position: Int)
+    }
+
     inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.imageViewPost)
     }
@@ -21,8 +32,12 @@ class GalleryAdapter(private val postList: List<Int>) : RecyclerView.Adapter<Gal
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val imageResId = postList[position]
-        holder.imageView.setImageResource(imageResId)
+        val post = postList[position]
+        holder.imageView.setImageResource(post.postImageId)
+
+        holder.imageView.setOnClickListener {
+            listener.onPostClick(position)
+        }
     }
 
 }
