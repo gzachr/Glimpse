@@ -60,6 +60,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,5 +78,6 @@ dependencies {
     implementation ("androidx.camera:camera-view:1.0.0-alpha30")
     implementation ("androidx.camera:camera-extensions:1.0.0-alpha30")
     implementation ("com.github.bumptech.glide:glide:4.15.0")
+    implementation ("com.google.android.material:material:1.6.1")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.0")
 }

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 
-class PostsAdapter(private val postList: List<String>) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
+class GalleryAdapter(private val postList: List<Int>) : RecyclerView.Adapter<GalleryAdapter.PostViewHolder>() {
     inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.imageViewPost)
     }

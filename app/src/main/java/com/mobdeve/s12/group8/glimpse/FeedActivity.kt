@@ -1,6 +1,9 @@
 package com.mobdeve.s12.group8.glimpse
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageButton
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
@@ -18,6 +21,13 @@ class FeedActivity: AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private var helper = LinearSnapHelper()
     private var isLiked = false
+    private lateinit var tempButton: ImageButton
+
+    private val newIntentActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            print("hi")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +37,7 @@ class FeedActivity: AppCompatActivity() {
         recyclerView.adapter = FeedAdapter(data)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         helper.attachToRecyclerView(recyclerView)
+        tempButton = binding.feedViewAllBtn
 
         binding.heartBtn.setOnClickListener {
             if(isLiked)
@@ -35,6 +46,11 @@ class FeedActivity: AppCompatActivity() {
                 binding.heartBtn.setImageResource(R.drawable.heart_icon_filled)
 
             isLiked = !isLiked
+        }
+
+        tempButton.setOnClickListener {
+            val newIntent = Intent(this,GalleryActivity::class.java)
+            newIntentActivity.launch(newIntent)
         }
 
         binding.feedReturnToHomeBtn.setOnClickListener {
