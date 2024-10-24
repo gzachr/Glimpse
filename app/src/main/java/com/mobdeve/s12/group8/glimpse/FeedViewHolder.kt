@@ -26,8 +26,10 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
         // Load post image with rounded corners
         Glide.with(binding.feedPostIv.context)
             .load(post.postImageId)
+            .apply(RequestOptions().transform(RoundedCorners(16)))
             .into(binding.feedPostIv)
 
         binding.feedUsernameTv.text = post.username
+        binding.feedCreatedAtTv.text = post.createdAt
     }
 }

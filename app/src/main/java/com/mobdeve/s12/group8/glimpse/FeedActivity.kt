@@ -10,13 +10,14 @@ import com.mobdeve.s12.group8.glimpse.model.Post
 
 class FeedActivity: AppCompatActivity() {
     private var data: ArrayList<Post> = arrayListOf(
-        Post(R.drawable.post1, R.drawable.user1, "user1"),
-        Post(R.drawable.post2, R.drawable.user2, "user2"),
-        Post(R.drawable.post3, R.drawable.user3, "user3"),
+        Post(R.drawable.post1, R.drawable.user1, "user1", "16h ago", "hello world 1"),
+        Post(R.drawable.post2, R.drawable.user2, "user2", "15h ago", "hello world 2"),
+        Post(R.drawable.post3, R.drawable.user3, "user3", "14h ago", "hello world 3"),
     )
     private lateinit var binding: ActivityFeedBinding
     private lateinit var recyclerView: RecyclerView
     private var helper = LinearSnapHelper()
+    private var isLiked = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,5 +27,19 @@ class FeedActivity: AppCompatActivity() {
         recyclerView.adapter = FeedAdapter(data)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         helper.attachToRecyclerView(recyclerView)
+
+        binding.heartBtn.setOnClickListener {
+            if(isLiked)
+                binding.heartBtn.setImageResource(R.drawable.heart_icon_outline)
+            else
+                binding.heartBtn.setImageResource(R.drawable.heart_icon_filled)
+
+            isLiked = !isLiked
+        }
+
+        binding.feedReturnToHomeBtn.setOnClickListener {
+            //TODO return to home activity, remove this activity from stack?
+        }
+
     }
 }
