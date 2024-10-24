@@ -35,6 +35,7 @@
         <activity android:name=".LoginActivity"></activity>
         <activity android:name=".RegisterActivity"></activity>
         <activity android:name=".HomeActivity"></activity>
+        <activity android:name=".FeedActivity"></activity>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
