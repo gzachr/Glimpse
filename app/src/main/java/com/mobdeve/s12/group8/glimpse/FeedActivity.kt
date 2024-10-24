@@ -1,5 +1,6 @@
 package com.mobdeve.s12.group8.glimpse
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,7 +39,7 @@ class FeedActivity: AppCompatActivity() {
         }
 
         binding.feedReturnToHomeBtn.setOnClickListener {
-            //TODO return to home activity, remove this activity from stack?
+            finish()
         }
 
     }

@@ -35,13 +35,13 @@
             android:background="@drawable/rounded_button"
             android:backgroundTint="@color/primary_dark"
             android:drawableStart="@drawable/friends_icon"
-            android:drawablePadding="-40dp"
+            android:drawablePadding="-50dp"
             android:paddingStart="50dp"
             android:paddingEnd="7dp"
             android:text="Friends"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="18sp" />
+            android:textSize="17sp" />
 
         <ImageButton
             android:id="@+id/feedMessageBtn"
