@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Glimpse</string>
+    <string name="post_image">post_image</string>
 </resources>
