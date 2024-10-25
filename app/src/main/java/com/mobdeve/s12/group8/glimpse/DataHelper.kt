@@ -1,6 +1,7 @@
 package com.mobdeve.s12.group8.glimpse
 
 import com.mobdeve.s12.group8.glimpse.model.Post
+import com.mobdeve.s12.group8.glimpse.model.Reaction
 import java.util.ArrayList
 
 object DataHelper {
@@ -22,5 +23,15 @@ object DataHelper {
             )
         )
         return data
+    }
+    fun loadReactionData(): ArrayList<Reaction> {
+        val data2 = ArrayList<Reaction>()
+        data2.add(
+            Reaction(
+                R.drawable.post1, R.drawable.user1, "user1", "liked your post"
+            )
+        )
+
+        return data2
     }
 }

@@ -30,6 +30,10 @@ class HomeActivity: AppCompatActivity() {
             val intent = Intent(applicationContext, FeedActivity::class.java)
             startActivity(intent)
         }
+        binding.emptyBtn.setOnClickListener {
+            val intent = Intent(applicationContext, ReactionActivity::class.java)
+            startActivity(intent)
+        }
 
         binding.previewView.viewTreeObserver.addOnGlobalLayoutListener {
             // Get the width of the PreviewView (which is match_parent)

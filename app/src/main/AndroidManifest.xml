@@ -40,6 +40,7 @@
         <activity android:name=".HomeActivity" />
         <activity android:name=".FeedActivity" />
         <activity android:name=".PostActivity"/>
+        <activity android:name=".ReactionActivity" android:exported = "true"/>
 
         <meta-data
             android:name="preloaded_fonts"
