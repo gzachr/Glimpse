@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.mobdeve.s12.group8.glimpse.model.Reaction
 
-class ReactionAdapter(private val data: ArrayList<Reaction>): Adapter<ReactionViewHolder>() {
+class ReactionAdapter(private val data2: ArrayList<Reaction>): Adapter<ReactionViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReactionViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_reaction, parent, false)
@@ -14,10 +14,11 @@ class ReactionAdapter(private val data: ArrayList<Reaction>): Adapter<ReactionVi
     }
 
     override fun getItemCount(): Int {
-        return data.size
+        return data2.size
     }
 
     override fun onBindViewHolder(holder: ReactionViewHolder, position: Int) {
-        holder.bindData(data.get(position))
+        val currItem = data2[position]
+        holder.bindData(currItem)
     }
 }
