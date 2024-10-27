@@ -27,11 +27,17 @@ class ReactionActivity: AppCompatActivity(), ReactionAdapter.OnNotificationsClic
     }
 
     override fun onNotificationsClick(position: Int) {
-        val newIntent = Intent(this,FeedActivity::class.java)
-        newIntent.putExtra("position", position)
-        setResult(RESULT_OK, newIntent)
-        newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        startActivity(newIntent)
+        val homeIntent = Intent(this, HomeActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        startActivity(homeIntent)
+
+        val feedIntent = Intent(this, FeedActivity::class.java).apply {
+            putExtra("position", position)
+        }
+        startActivity(feedIntent)
+
         finish()
     }
+
 }

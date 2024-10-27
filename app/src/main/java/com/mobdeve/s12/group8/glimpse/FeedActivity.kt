@@ -2,8 +2,6 @@ package com.mobdeve.s12.group8.glimpse
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -45,13 +43,13 @@ class FeedActivity: AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         helper.attachToRecyclerView(recyclerView)
 
+        val sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val toastShown = sharedPreferences.getBoolean(TOAST_SHOWN_KEY, false)
+
         val position = intent.getIntExtra("position", -1)
         if (position >= 0) {
             recyclerView.scrollToPosition(position)
         }
-
-        val sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        val toastShown = sharedPreferences.getBoolean(TOAST_SHOWN_KEY, false)
 
         if (!toastShown) {
             Toast.makeText(this, "Double-tap to show location of post!", Toast.LENGTH_LONG).show()
@@ -87,4 +85,19 @@ class FeedActivity: AppCompatActivity() {
 
 
     }
+
+//    override fun onResume() {
+//        super.onResume()
+//        Log.d("onResume", "i resumed")
+//
+//        // Check if the intent has the "position" extra and scroll if it's valid
+//        val position = intent.getIntExtra("position", -1)
+//        if (position >= 0) {
+//            recyclerView.scrollToPosition(position)
+//
+//            // Clear the position extra to avoid redundant scrolling on future resumes
+//            intent.removeExtra("position")
+//        }
+//    }
+
 }

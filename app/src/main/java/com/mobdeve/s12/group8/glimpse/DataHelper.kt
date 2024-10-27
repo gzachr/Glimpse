@@ -49,6 +49,11 @@ object DataHelper {
         )
         data.add(
             Post(
+                R.drawable.post9, R.drawable.user1, "user1", "20h ago", "it raining #staysafe"
+            )
+        )
+        data.add(
+            Post(
                 R.drawable.post10, R.drawable.user8, "user8", "21h ago", "fun times"
             )
         )
@@ -60,6 +65,16 @@ object DataHelper {
         data.add(
             Reaction(
                 R.drawable.post1, "user2", "1", 0
+            )
+        )
+        data.add(
+            Reaction(
+                R.drawable.post9, "user3", "1", 8
+            )
+        )
+        data.add(
+            Reaction(
+                R.drawable.post9, "user7", "1", 8
             )
         )
         data.add(
@@ -80,6 +95,11 @@ object DataHelper {
         data.add(
             Reaction(
                 R.drawable.post6, "user5", "3", 5
+            )
+        )
+        data.add(
+            Reaction(
+                R.drawable.post9, "user8", "4", 8
             )
         )
         data.add(
