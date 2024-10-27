@@ -2,6 +2,7 @@ package com.mobdeve.s12.group8.glimpse
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityReactionsBinding
@@ -25,10 +26,9 @@ class ReactionActivity: AppCompatActivity(), ReactionAdapter.OnNotificationsClic
         }
     }
 
-    override fun onNotificationsClick(postImageId: Int) {
+    override fun onNotificationsClick(position: Int) {
         val newIntent = Intent(this,FeedActivity::class.java)
-        newIntent.putExtra("from", 2)
-        newIntent.putExtra("postImageId", postImageId)
+        newIntent.putExtra("position", position)
         setResult(RESULT_OK, newIntent)
         newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         startActivity(newIntent)

@@ -13,7 +13,7 @@ class ReactionAdapter(
 ) : RecyclerView.Adapter<ReactionViewHolder>() {
 
     interface OnNotificationsClickListener {
-        fun onNotificationsClick(postImageId: Int)
+        fun onNotificationsClick(position: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReactionViewHolder {
@@ -27,11 +27,11 @@ class ReactionAdapter(
 
     override fun onBindViewHolder(holder: ReactionViewHolder, position: Int) {
         val currItem = data[position]
-        Log.d("ReactionAdapter", "Current item: $currItem")
         holder.bindData(currItem)
 
         holder.itemView.setOnClickListener {
-            listener.onNotificationsClick(currItem.postImageId)
+            val pos = currItem.position
+            listener.onNotificationsClick(pos)
         }
     }
 }

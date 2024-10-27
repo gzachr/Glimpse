@@ -2,6 +2,7 @@ package com.mobdeve.s12.group8.glimpse
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,25 +27,12 @@ class FeedActivity: AppCompatActivity() {
     private val newIntentActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data
-
-            if (data?.getIntExtra("from", 0)?.equals(1) == true) {
-                val position = data.getIntExtra("position", -1)
-                position.let {
-                    if (position >= 0) {
-                        recyclerView.scrollToPosition(position)
-                    }
+            val position = data?.getIntExtra("position", -1)
+            position?.let {
+                if (position >= 0) {
+                    recyclerView.scrollToPosition(position)
                 }
             }
-            else if (data?.getIntExtra("from", 0)?.equals(2) == true) {
-                val postImageId = data.getIntExtra("postImageId", -1)
-                if (postImageId != -1) {
-                    val position = this.data.indexOfFirst { it.postImageId == postImageId }
-                    if (position >= 0) {
-                        recyclerView.scrollToPosition(position)
-                    }
-                }
-            }
-
         }
     }
 
@@ -56,6 +44,11 @@ class FeedActivity: AppCompatActivity() {
         recyclerView.adapter = FeedAdapter(data)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         helper.attachToRecyclerView(recyclerView)
+
+        val position = intent.getIntExtra("position", -1)
+        if (position >= 0) {
+            recyclerView.scrollToPosition(position)
+        }
 
         val sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val toastShown = sharedPreferences.getBoolean(TOAST_SHOWN_KEY, false)
