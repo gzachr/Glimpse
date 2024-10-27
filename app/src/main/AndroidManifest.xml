@@ -42,7 +42,6 @@
         <activity android:name=".LoginActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"/>
-
         <activity android:name=".RegisterActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"/>
@@ -53,6 +52,9 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait"/>
         <activity android:name=".PostActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ReactionActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"/>
 

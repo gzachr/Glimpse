@@ -19,6 +19,7 @@ class HomeActivity: AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var gestureDetector: GestureDetector
     private var lensFacing: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+    private var firstToast = false
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,8 +27,18 @@ class HomeActivity: AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        if (!firstToast) {
+            Toast.makeText(this, "Double-tap to switch camera!", Toast.LENGTH_LONG).show()
+            firstToast = true
+        }
+
         binding.viewFeedBtn.setOnClickListener {
             val intent = Intent(applicationContext, FeedActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.notificationBtn.setOnClickListener {
+            val intent = Intent(applicationContext, ReactionActivity::class.java)
             startActivity(intent)
         }
 
