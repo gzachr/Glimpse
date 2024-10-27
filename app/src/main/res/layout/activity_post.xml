@@ -33,7 +33,7 @@
                 android:background="@drawable/rounded_button"
                 android:backgroundTint="#002A2929"
                 android:scaleType="center"
-                android:src="@drawable/exit_icon" />
+                android:src="@drawable/close_icon" />
 
             <Button
                 android:id="@+id/friendsBtn"

@@ -59,11 +59,6 @@ object DataHelper {
         )
         data.add(
             Post(
-                R.drawable.post11, R.drawable.user10, "user10", "21h ago", "what a journey."
-            )
-        )
-        data.add(
-            Post(
                 R.drawable.post12, R.drawable.user2, "user2", "22h ago", "she cheated on me.."
             )
         )
@@ -80,31 +75,6 @@ object DataHelper {
         data.add(
             Post(
                 R.drawable.post15, R.drawable.user7, "user7", "2213h ago", "nice music"
-            )
-        )
-        data.add(
-            Post(
-                R.drawable.post16, R.drawable.user2, "user2", "23h ago", "pouring my heart out"
-            )
-        )
-        data.add(
-            Post(
-                R.drawable.post17, R.drawable.user3, "user3", "23h ago", "girlboss monke go gym"
-            )
-        )
-        data.add(
-            Post(
-                R.drawable.post18, R.drawable.user6, "user6", "23h ago", "down 200 bands"
-            )
-        )
-        data.add(
-            Post(
-                R.drawable.post19, R.drawable.user10, "user10", "23h ago", "MANG INASALLLL"
-            )
-        )
-        data.add(
-            Post(
-                R.drawable.post20, R.drawable.user3, "user3", "1d ago", "dessert @Wolfgang"
             )
         )
         return data
