@@ -44,7 +44,7 @@ object DataHelper {
         )
         data.add(
             Post(
-                R.drawable.post8, R.drawable.user7, "user7", "19h ago", "shrine core"
+                R.drawable.post8, R.drawable.user7, "user7", "19h ago", "sigma grind core"
             )
         )
         data.add(
