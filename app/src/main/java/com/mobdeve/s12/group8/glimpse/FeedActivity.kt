@@ -74,6 +74,11 @@ class FeedActivity : AppCompatActivity() {
             newIntentActivity.launch(newIntent)
         }
 
+        binding.feedProfileBtn.setOnClickListener {
+            val intent = Intent(applicationContext, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.feedMessageBtn.setOnClickListener {
             val newIntent = Intent(this, ReactionActivity::class.java).apply {
                 putParcelableArrayListExtra("data", posts)

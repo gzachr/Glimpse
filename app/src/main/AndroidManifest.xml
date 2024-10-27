@@ -58,7 +58,9 @@
         <activity android:name=".ReactionActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"/>
-
+        <activity android:name=".ProfileActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

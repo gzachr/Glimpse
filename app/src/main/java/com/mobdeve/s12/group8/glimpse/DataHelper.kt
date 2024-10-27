@@ -44,7 +44,7 @@ object DataHelper {
         )
         data.add(
             Post(
-                R.drawable.post8, R.drawable.user7, "user7", "19h ago", "shrine core"
+                R.drawable.post8, R.drawable.user7, "user7", "19h ago", "sigma grind core"
             )
         )
         data.add(
@@ -55,6 +55,56 @@ object DataHelper {
         data.add(
             Post(
                 R.drawable.post10, R.drawable.user8, "user8", "21h ago", "fun times"
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post11, R.drawable.user10, "user10", "21h ago", "what a journey."
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post12, R.drawable.user2, "user2", "22h ago", "she cheated on me.."
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post13, R.drawable.user5, "user5", "22h ago", "phone loss any% fr"
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post14, R.drawable.user4, "user4", "22h ago", "wasn't smelly at all"
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post15, R.drawable.user7, "user7", "2213h ago", "nice music"
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post16, R.drawable.user2, "user2", "23h ago", "pouring my heart out"
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post17, R.drawable.user3, "user3", "23h ago", "girlboss monke go gym"
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post18, R.drawable.user6, "user6", "23h ago", "down 200 bands"
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post19, R.drawable.user10, "user10", "23h ago", "MANG INASALLLL"
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post20, R.drawable.user3, "user3", "1d ago", "dessert @Wolfgang"
             )
         )
         return data

@@ -45,6 +45,11 @@ class HomeActivity: AppCompatActivity() {
             startActivityForResult(intent, REQUEST_CODE_FEED)  // Use startActivityForResult
         }
 
+        binding.postExitBtn.setOnClickListener {
+            val intent = Intent(applicationContext, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.notificationBtn.setOnClickListener {
             val intent = Intent(applicationContext, ReactionActivity::class.java)
             intent.putExtra("data", posts)
