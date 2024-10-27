@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityGalleryBinding
 import com.mobdeve.s12.group8.glimpse.databinding.ItemPostBinding
 import com.mobdeve.s12.group8.glimpse.databinding.ItemReactionBinding
-import com.mobdeve.s12.group8.glimpse.model.Post
+import Post
 import com.mobdeve.s12.group8.glimpse.model.Reaction
 
 class GalleryAdapter(

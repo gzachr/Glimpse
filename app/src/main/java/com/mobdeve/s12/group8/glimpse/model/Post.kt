@@ -1,18 +1,41 @@
-package com.mobdeve.s12.group8.glimpse.model
+import android.os.Parcel
+import android.os.Parcelable
 
-class Post(postImageId: Int, userImageId: Int, username: String, createdAt: String, caption: String){
-    var postImageId = postImageId
-        private set
+data class Post(
+    var postImageId: Int,
+    var userImageId: Int,
+    var username: String,
+    var createdAt: String,
+    var caption: String
+) : Parcelable {
 
-    var userImageId = userImageId
-        private set
+    constructor(parcel: Parcel) : this(
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readString() ?: ""
+    )
 
-    var username = username
-        private set
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(postImageId)
+        parcel.writeInt(userImageId)
+        parcel.writeString(username)
+        parcel.writeString(createdAt)
+        parcel.writeString(caption)
+    }
 
-    var createdAt = createdAt
-        private set
+    override fun describeContents(): Int {
+        return 0
+    }
 
-    var caption = caption
-        private set
+    companion object CREATOR : Parcelable.Creator<Post> {
+        override fun createFromParcel(parcel: Parcel): Post {
+            return Post(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Post?> {
+            return arrayOfNulls(size)
+        }
+    }
 }

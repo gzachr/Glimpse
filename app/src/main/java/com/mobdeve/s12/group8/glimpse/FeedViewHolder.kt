@@ -9,6 +9,7 @@ import android.net.Uri
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.View
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
@@ -18,7 +19,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
-import com.mobdeve.s12.group8.glimpse.model.Post
+import Post
 import com.bumptech.glide.request.target.Target
 
 class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding.root) {
@@ -27,6 +28,10 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
 
     @SuppressLint("ClickableViewAccessibility")
     fun bind(post: Post) {
+        if (post.username != "user1") {
+            binding.deleteBtn.visibility = View.GONE
+        }
+
         Glide.with(binding.feedUserIv.context)
             .load(post.userImageId)
             .apply(RequestOptions().transform(RoundedCorners(50)))
@@ -91,5 +96,9 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
         })
 
         fadeOut.start() // Start the fade-out animation
+    }
+
+    fun setDeleteButtonListener(listener: View.OnClickListener) {
+        binding.deleteBtn.setOnClickListener(listener) // Set the click listener for delete button
     }
 }

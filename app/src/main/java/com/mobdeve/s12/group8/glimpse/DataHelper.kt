@@ -1,6 +1,6 @@
 package com.mobdeve.s12.group8.glimpse
 
-import com.mobdeve.s12.group8.glimpse.model.Post
+import Post
 import com.mobdeve.s12.group8.glimpse.model.Reaction
 import java.util.ArrayList
 

@@ -28,6 +28,8 @@
                 android:scaleType="centerCrop"
                 tools:srcCompat="@tools:sample/avatars" />
 
+
+
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -49,6 +51,19 @@
             app:layout_constraintBottom_toBottomOf="@+id/feedCv"
             app:layout_constraintEnd_toEndOf="@+id/feedCv"
             app:layout_constraintStart_toStartOf="@+id/feedCv" />
+
+        <ImageButton
+            android:id="@+id/deleteBtn"
+            android:layout_width="40dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="340dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="@color/primary_dark"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/delete"
+            app:tint="@color/white" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
