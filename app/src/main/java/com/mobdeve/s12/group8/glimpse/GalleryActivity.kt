@@ -19,6 +19,10 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
         binding.recyclerViewPosts.layoutManager = GridLayoutManager(this, 3)
         binding.recyclerViewPosts.adapter = GalleryAdapter(data, this)
 
+        binding.reactionExitButton.setOnClickListener {
+            val intent = Intent(applicationContext, ProfileActivity::class.java)
+            startActivity(intent)
+        }
 
         binding.galleryMessageBtn.setOnClickListener{
             val intent = Intent(applicationContext, ReactionActivity::class.java)

@@ -37,6 +37,11 @@ class HomeActivity: AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.postExitBtn.setOnClickListener {
+            val intent = Intent(applicationContext, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.notificationBtn.setOnClickListener {
             val intent = Intent(applicationContext, ReactionActivity::class.java)
             startActivity(intent)
