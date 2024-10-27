@@ -24,14 +24,56 @@ object DataHelper {
         )
         return data
     }
+
     fun loadReactionData(): ArrayList<Reaction> {
-        val data2 = ArrayList<Reaction>()
-        data2.add(
+        val data = ArrayList<Reaction>()
+        data.add(
             Reaction(
-                R.drawable.post1, R.drawable.user1, "user1", "liked your post"
+                R.drawable.post1, "user1", "16"
+            )
+        )
+        data.add(
+            Reaction(
+                R.drawable.post1, "user1", "16"
+            )
+        )
+        data.add(
+            Reaction(
+                R.drawable.post1, "user1", "16"
+            )
+        )
+        data.add(
+            Reaction(
+                R.drawable.post1, "user1", "16"
+            )
+        )
+        data.add(
+            Reaction(
+                R.drawable.post1, "user1", "16"
+            )
+        )
+        data.add(
+            Reaction(
+                R.drawable.post1, "user1", "16"
+            )
+        )
+        data.add(
+            Reaction(
+                R.drawable.post1, "user1", "16"
+            )
+        )
+        data.add(
+            Reaction(
+                R.drawable.post1, "user1", "16"
+            )
+        )
+        data.add(
+            Reaction(
+                R.drawable.post1, "user1", "16"
             )
         )
 
-        return data2
+
+        return data
     }
 }

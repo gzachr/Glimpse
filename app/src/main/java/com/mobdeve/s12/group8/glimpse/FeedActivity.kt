@@ -18,17 +18,28 @@ class FeedActivity: AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private var helper = LinearSnapHelper()
     private var isLiked = false
-    private lateinit var galleryButton: ImageButton
-
     private val newIntentActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data
-            val position = data?.getIntExtra("position", -1)
-            position?.let {
-                if (position >= 0) {
-                    recyclerView.scrollToPosition(position)
+
+            if (data?.getIntExtra("from", 0)?.equals(1) == true) {
+                val position = data.getIntExtra("position", -1)
+                position.let {
+                    if (position >= 0) {
+                        recyclerView.scrollToPosition(position)
+                    }
                 }
             }
+            else if (data?.getIntExtra("from", 0)?.equals(2) == true) {
+                val postImageId = data.getIntExtra("postImageId", -1)
+                if (postImageId != -1) {
+                    val position = this.data.indexOfFirst { it.postImageId == postImageId }
+                    if (position >= 0) {
+                        recyclerView.scrollToPosition(position)
+                    }
+                }
+            }
+
         }
     }
 
@@ -40,7 +51,6 @@ class FeedActivity: AppCompatActivity() {
         recyclerView.adapter = FeedAdapter(data)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         helper.attachToRecyclerView(recyclerView)
-        galleryButton = binding.feedViewAllBtn
 
         binding.heartBtn.setOnClickListener {
             if(isLiked)
@@ -51,14 +61,20 @@ class FeedActivity: AppCompatActivity() {
             isLiked = !isLiked
         }
 
-        galleryButton.setOnClickListener {
+        binding.feedViewAllBtn.setOnClickListener{
             val newIntent = Intent(this,GalleryActivity::class.java)
+            newIntentActivity.launch(newIntent)
+        }
+
+        binding.feedMessageBtn.setOnClickListener {
+            val newIntent = Intent(this,ReactionActivity::class.java)
             newIntentActivity.launch(newIntent)
         }
 
         binding.feedReturnToHomeBtn.setOnClickListener {
             finish()
         }
+
 
     }
 }

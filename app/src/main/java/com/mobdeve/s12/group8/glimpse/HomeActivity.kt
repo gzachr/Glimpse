@@ -30,7 +30,8 @@ class HomeActivity: AppCompatActivity() {
             val intent = Intent(applicationContext, FeedActivity::class.java)
             startActivity(intent)
         }
-        binding.emptyBtn.setOnClickListener {
+
+        binding.notificationBtn.setOnClickListener {
             val intent = Intent(applicationContext, ReactionActivity::class.java)
             startActivity(intent)
         }

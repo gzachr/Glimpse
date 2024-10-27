@@ -1,13 +1,16 @@
 package com.mobdeve.s12.group8.glimpse
 
-import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.recyclerview.widget.RecyclerView
+import com.mobdeve.s12.group8.glimpse.databinding.ActivityGalleryBinding
+import com.mobdeve.s12.group8.glimpse.databinding.ItemPostBinding
+import com.mobdeve.s12.group8.glimpse.databinding.ItemReactionBinding
 import com.mobdeve.s12.group8.glimpse.model.Post
+import com.mobdeve.s12.group8.glimpse.model.Reaction
 
 class GalleryAdapter(
     private val postList: ArrayList<Post>,
@@ -18,13 +21,15 @@ class GalleryAdapter(
         fun onPostClick(position: Int)
     }
 
-    inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView: ImageView = itemView.findViewById(R.id.imageViewPost)
+    inner class PostViewHolder(private val binding: ItemPostBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bindData(post: Post) {
+            binding.imageViewPost.setImageResource(post.postImageId)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_post, parent, false)
-        return PostViewHolder(view)
+        val binding = ItemPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return PostViewHolder(binding)
     }
 
     override fun getItemCount(): Int {
@@ -33,9 +38,9 @@ class GalleryAdapter(
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = postList[position]
-        holder.imageView.setImageResource(post.postImageId)
+        holder.bindData(post)
 
-        holder.imageView.setOnClickListener {
+        holder.itemView.setOnClickListener {
             listener.onPostClick(position)
         }
     }
