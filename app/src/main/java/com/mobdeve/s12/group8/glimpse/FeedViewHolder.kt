@@ -47,6 +47,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
 
         binding.feedUsernameTv.text = post.username
         binding.feedCreatedAtTv.text = post.createdAt
+        binding.feedCaptionTv.text = post.caption
 
         //on double tap change to location view
         val gestureDetector =
