@@ -57,6 +57,12 @@ class HomeActivity: AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.friendsBtn.setOnClickListener {
+            val intent = Intent(applicationContext, FriendsListActivity::class.java)
+            intent.putExtra("data", posts)
+            startActivity(intent)
+        }
+
         binding.previewView.viewTreeObserver.addOnGlobalLayoutListener {
             // Get the width of the PreviewView (which is match_parent)
             val previewWidth = binding.previewView.width

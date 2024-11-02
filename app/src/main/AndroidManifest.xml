@@ -22,45 +22,57 @@
         android:theme="@style/Theme.Glimpse"
         tools:targetApi="31">
         <activity
+            android:name=".FriendsListActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:exported="false" />
+        <activity
             android:name=".GalleryActivity"
-            android:exported="false"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Glimpse"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Glimpse">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity"
+        <activity
+            android:name=".LoginActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".RegisterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".RegisterActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".HomeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".HomeActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTop" />
-        <activity android:name=".FeedActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".FeedActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".PostActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PostActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ReactionActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ReactionActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ProfileActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ProfileActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
