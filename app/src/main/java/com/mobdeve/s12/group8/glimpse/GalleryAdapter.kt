@@ -41,7 +41,7 @@ class GalleryAdapter(
         holder.bindData(post)
 
         holder.itemView.setOnClickListener {
-            listener.onPostClick(position)
+            listener.onPostClick(post.position)
         }
     }
 

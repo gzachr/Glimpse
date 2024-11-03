@@ -151,8 +151,11 @@ class HomeActivity: AppCompatActivity() {
             }
         }
     }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        val checkFilter = intent.getStringExtra("usernameFilter") ?: "none"
+
         intent.let {
             val updatedPosts = it.getParcelableArrayListExtra<Post>("updated_posts")
             updatedPosts?.let { newPosts ->
@@ -171,10 +174,24 @@ class HomeActivity: AppCompatActivity() {
                     putExtra("data", posts)
                     putExtra("reactions", reactions)
                     putExtra("position", position)
+                    if (checkFilter != "none") {
+                        val filterUsername = it.getStringExtra("usernameFilter")
+                        putExtra("filterUsername", filterUsername)
+                    }
                 }
                 startActivityForResult(feedIntent, REQUEST_CODE_FEED)
+            } else {
+                val feedIntent = Intent(applicationContext, FeedActivity::class.java).apply {
+                    putExtra("data", posts)
+                    putExtra("reactions", reactions)
+                    if (checkFilter != "none") {
+                        val filterUsername = it.getStringExtra("usernameFilter")
+                        putExtra("filterUsername", filterUsername)
+                    }
+                }
+                startActivityForResult(feedIntent, REQUEST_CODE_FEED)
+
             }
         }
     }
-
 }

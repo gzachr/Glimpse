@@ -6,11 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityGalleryBinding
 import Post
+import android.util.Log
 import com.mobdeve.s12.group8.glimpse.model.Reaction
 
 class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener {
     private lateinit var binding: ActivityGalleryBinding
     private var posts: ArrayList<Post> = ArrayList()
+    private var filteredPosts: ArrayList<Post> = ArrayList()
     private var reactions: ArrayList<Reaction> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,9 +22,16 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
 
         posts = intent.getParcelableArrayListExtra<Post>("data") ?: ArrayList()
         reactions = intent.getParcelableArrayListExtra<Reaction>("reactions") ?: ArrayList()
+        val usernameFilter = intent.getStringExtra("galleryFilter") ?: "none"
+        filteredPosts = ArrayList(posts.filter { it.username == usernameFilter })
 
         binding.recyclerViewPosts.layoutManager = GridLayoutManager(this, 3)
-        binding.recyclerViewPosts.adapter = GalleryAdapter(posts, this)
+
+        if (usernameFilter == "none") {
+            binding.recyclerViewPosts.adapter = GalleryAdapter(posts, this)
+        } else {
+            binding.recyclerViewPosts.adapter = GalleryAdapter(filteredPosts, this)
+        }
 
         binding.galleryMessageBtn.setOnClickListener {
             val newIntent = Intent(this, ReactionActivity::class.java).apply {
@@ -41,6 +50,12 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
             setResult(RESULT_OK, resultIntent)
             startActivity(resultIntent)
             finish()
+        }
+
+        binding.galleryFriendsBtn.setOnClickListener {
+            val intent = Intent(applicationContext, FriendsListActivity::class.java)
+            intent.putExtra("data", posts)
+            startActivity(intent)
         }
     }
 

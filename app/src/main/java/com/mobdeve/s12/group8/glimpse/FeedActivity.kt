@@ -12,9 +12,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityFeedBinding
 import com.mobdeve.s12.group8.glimpse.model.Reaction
 
-class FeedActivity : AppCompatActivity() {
+class FeedActivity : AppCompatActivity(), FeedAdapter.PostDeleteCallback {
     private var posts: ArrayList<Post> = ArrayList()
+    private var filteredPosts: ArrayList<Post> = ArrayList()
     private var reactions: ArrayList<Reaction> = ArrayList()
+    private lateinit var usernameFilter: String
     private lateinit var binding: ActivityFeedBinding
     private lateinit var recyclerView: RecyclerView
     private var helper = LinearSnapHelper()
@@ -27,7 +29,17 @@ class FeedActivity : AppCompatActivity() {
             val position = result.data?.getIntExtra("position", -1)
             position?.let {
                 if (it >= 0) {
-                    recyclerView.scrollToPosition(it)
+                    if (usernameFilter != "none") {
+                        val originalPost = posts.getOrNull(position)
+                        if (originalPost != null) {
+                            val newPosition = filteredPosts.indexOf(originalPost)
+                            if (newPosition >= 0) {
+                                recyclerView.scrollToPosition(newPosition)
+                            }
+                        }
+                    } else {
+                        recyclerView.scrollToPosition(it)
+                    }
                 }
             }
         }
@@ -37,11 +49,19 @@ class FeedActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         posts = intent.getParcelableArrayListExtra<Post>("data") ?: ArrayList()
         reactions = intent.getParcelableArrayListExtra<Reaction>("reactions") ?: ArrayList()
+        usernameFilter = intent.getStringExtra("filterUsername") ?: "none"
+        filteredPosts = ArrayList(posts.filter { it.username == usernameFilter })
 
         binding = ActivityFeedBinding.inflate(layoutInflater)
         setContentView(binding.root)
         recyclerView = binding.feedRv
-        recyclerView.adapter = FeedAdapter(posts, reactions)
+
+        if (usernameFilter == "none") {
+            recyclerView.adapter = FeedAdapter(posts, reactions, this)
+        } else {
+            recyclerView.adapter = FeedAdapter(filteredPosts, reactions, this)
+        }
+
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         helper.attachToRecyclerView(recyclerView)
 
@@ -50,7 +70,17 @@ class FeedActivity : AppCompatActivity() {
         val position = intent.getIntExtra("position", -1)
 
         if (position >= 0) {
-            recyclerView.scrollToPosition(position)
+            if (usernameFilter != "none") {
+                val originalPost = posts.getOrNull(position)
+                if (originalPost != null) {
+                    val newPosition = filteredPosts.indexOf(originalPost)
+                    if (newPosition >= 0) {
+                        recyclerView.scrollToPosition(newPosition)
+                    }
+                }
+            } else {
+                recyclerView.scrollToPosition(position)
+            }
         }
 
         if (!toastShown) {
@@ -70,6 +100,7 @@ class FeedActivity : AppCompatActivity() {
             val newIntent = Intent(this, GalleryActivity::class.java).apply {
                 putParcelableArrayListExtra("data", posts)
                 putParcelableArrayListExtra("reactions", reactions)
+                putExtra("galleryFilter", usernameFilter)
             }
             newIntentActivity.launch(newIntent)
         }
@@ -95,6 +126,12 @@ class FeedActivity : AppCompatActivity() {
             setResult(RESULT_OK, resultIntent)
             finish()
         }
+
+        binding.feedFriendsBtn.setOnClickListener {
+            val intent = Intent(applicationContext, FriendsListActivity::class.java)
+            intent.putExtra("data", posts)
+            startActivity(intent)
+        }
     }
 
     override fun onBackPressed() {
@@ -111,11 +148,20 @@ class FeedActivity : AppCompatActivity() {
         setResult(RESULT_OK, resultIntent)
     }
 
-    fun updatePosts(updatedPosts: ArrayList<Post>, updatedReactions: ArrayList<Reaction>) {
-        posts.clear()
-        posts.addAll(updatedPosts)
+    override fun onPostDeleted(position: Int, postId: Int) {
+        val deletedPostIndex = posts.indexOfFirst { it.postImageId == postId }
 
-        reactions.clear()
-        reactions.addAll(updatedReactions)
+        if (deletedPostIndex >= 0) {
+            posts.removeAt(deletedPostIndex)
+
+            posts.forEachIndexed { index, post ->
+                if (index >= deletedPostIndex) {
+                    post.position -= 1
+                }
+            }
+        }
+
+        filteredPosts = ArrayList(posts.filter { it.username == usernameFilter })
+        recyclerView.adapter?.notifyDataSetChanged()
     }
 }

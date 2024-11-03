@@ -7,7 +7,12 @@ import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
 import Post
 import com.mobdeve.s12.group8.glimpse.model.Reaction
 
-class FeedAdapter(private val data: ArrayList<Post>, private val reactions: ArrayList<Reaction>): Adapter<FeedViewHolder>() {
+class FeedAdapter(private val data: ArrayList<Post>, private val reactions: ArrayList<Reaction>,  private val postDeleteCallback: PostDeleteCallback): Adapter<FeedViewHolder>() {
+
+    interface PostDeleteCallback {
+        fun onPostDeleted(position: Int, postId: Int)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
         val feedBinding = FeedLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return FeedViewHolder(feedBinding)
@@ -29,8 +34,7 @@ class FeedAdapter(private val data: ArrayList<Post>, private val reactions: Arra
 
             notifyItemRemoved(position)
             notifyItemRangeChanged(position, itemCount)
-
-            (holder.itemView.context as? FeedActivity)?.updatePosts(ArrayList(data), ArrayList(reactions))
+            postDeleteCallback.onPostDeleted(position, removedPostId)
         }
     }
 

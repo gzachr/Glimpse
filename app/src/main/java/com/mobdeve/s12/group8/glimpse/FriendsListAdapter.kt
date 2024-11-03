@@ -7,13 +7,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mobdeve.s12.group8.glimpse.databinding.ItemFriendsBinding
 
 class FriendsListAdapter(
-    private val postList: ArrayList<Post>
+    private val postList: ArrayList<Post>,
+    private val listener: OnFriendClickListener
 ) : RecyclerView.Adapter<FriendsListAdapter.FriendsViewHolder>() {
+
+    interface OnFriendClickListener {
+        fun onFriendClick(username: String)
+    }
 
     inner class FriendsViewHolder(private val binding: ItemFriendsBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindData(post: Post) {
             binding.friendImage.setImageResource(post.userImageId)
-            binding.friendUsername.text = "${post.username}"
+            binding.friendUsername.text = if (post.username == "user1") "You" else post.username
         }
     }
 
@@ -29,6 +34,11 @@ class FriendsListAdapter(
     override fun onBindViewHolder(holder: FriendsViewHolder, position: Int) {
         val post = postList[position]
         holder.bindData(post)
+
+        holder.itemView.setOnClickListener {
+            val username = post.username
+            listener.onFriendClick(username)
+        }
     }
 
 

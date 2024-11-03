@@ -18,7 +18,6 @@ class ReactionActivity: AppCompatActivity(), ReactionAdapter.OnNotificationsClic
         posts = intent.getParcelableArrayListExtra<Post>("data") ?: ArrayList()
         reactions = intent.getParcelableArrayListExtra<Reaction>("reactions") ?: ArrayList()
 
-
         binding = ActivityReactionsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -37,6 +36,7 @@ class ReactionActivity: AppCompatActivity(), ReactionAdapter.OnNotificationsClic
             putParcelableArrayListExtra("updated_posts", posts)
             putParcelableArrayListExtra("updated_reactions", reactions)
             putExtra("open_feed_at_position", position)
+            putExtra("usernameFilter", "none")
         }
         startActivity(homeIntent)
         finish()

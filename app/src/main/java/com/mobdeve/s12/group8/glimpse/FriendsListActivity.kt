@@ -1,17 +1,13 @@
 package com.mobdeve.s12.group8.glimpse
 
 import Post
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityFriendsListBinding
-import com.mobdeve.s12.group8.glimpse.databinding.ActivityReactionsBinding
-import com.mobdeve.s12.group8.glimpse.model.Reaction
 
-class FriendsListActivity : AppCompatActivity() {
+class FriendsListActivity : AppCompatActivity(), FriendsListAdapter.OnFriendClickListener {
     private var posts: ArrayList<Post> = ArrayList()
     private var friends: ArrayList<Post> = ArrayList()
     private lateinit var binding: ActivityFriendsListBinding
@@ -25,10 +21,20 @@ class FriendsListActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.friendsRecyclerView.layoutManager = LinearLayoutManager(this)
-        binding.friendsRecyclerView.adapter = FriendsListAdapter(friends)
+        binding.friendsRecyclerView.adapter = FriendsListAdapter(friends, this)
 
         binding.friendsExitButton.setOnClickListener {
             finish()
         }
+    }
+
+    override fun onFriendClick(username: String) {
+        val filterIntent = Intent(this, HomeActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("usernameFilter", username)
+
+        }
+        startActivity(filterIntent)
+        finish()
     }
 }
