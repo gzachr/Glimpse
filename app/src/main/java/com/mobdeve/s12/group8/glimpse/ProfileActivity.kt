@@ -15,5 +15,9 @@ class ProfileActivity : AppCompatActivity() {
         binding.profileExitButton.setOnClickListener{
             finish()
         }
+        binding.profileEditButton.setOnClickListener {
+            val intent = Intent(applicationContext, ProfileEditActivity::class.java)
+            startActivity(intent)
+        }
     }
 }
