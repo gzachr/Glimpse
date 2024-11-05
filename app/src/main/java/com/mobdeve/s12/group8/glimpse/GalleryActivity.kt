@@ -37,7 +37,10 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
                 binding.noPostsGalleryTextView.visibility = View.VISIBLE
             }
         }
-
+        binding.reactionExitButton.setOnClickListener {
+            val intent = Intent(applicationContext, ProfileActivity::class.java)
+            startActivity(intent)
+        }
         binding.galleryMessageBtn.setOnClickListener {
             val newIntent = Intent(this, ReactionActivity::class.java).apply {
                 putParcelableArrayListExtra("data", posts)
