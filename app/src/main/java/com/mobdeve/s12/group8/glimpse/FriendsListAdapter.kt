@@ -4,6 +4,9 @@ import Post
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.mobdeve.s12.group8.glimpse.databinding.ItemFriendsBinding
 
 class FriendsListAdapter(
@@ -17,7 +20,14 @@ class FriendsListAdapter(
 
     inner class FriendsViewHolder(private val binding: ItemFriendsBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindData(post: Post) {
-            binding.friendImage.setImageResource(post.userImageId)
+            //binding.friendImage.setImageResource(post.userImageId)
+
+
+            Glide.with(binding.friendImage.context)
+                .load(post.userImageId)
+                .apply(RequestOptions().transform(RoundedCorners(100)))
+                .into(binding.friendImage)
+
             binding.friendUsername.text = if (post.username == "user1") "You" else post.username
         }
     }
