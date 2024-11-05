@@ -53,50 +53,92 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageButton
-                android:id="@+id/profileEditImage"
+            <ImageView
+                android:id="@+id/currentProfileImage"
                 android:layout_width="250dp"
                 android:layout_height="250dp"
                 android:layout_marginStart="80dp"
                 android:layout_marginTop="60dp"
                 android:layout_marginEnd="80dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/upload_image_icon"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/user1" />
+
+            <ImageButton
+                android:id="@+id/profileEditImage"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="80dp"
+                android:layout_marginTop="232dp"
+                android:layout_marginEnd="80dp"
+                android:background="@android:color/transparent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/upload_profile_photo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/profileEditName"
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/editUsername"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="176dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="177dp"
-                android:fontFamily="@font/poppins_semibold"
-                android:text="Edit Name"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/rounded_edit_text_background"
+                android:ems="10"
+                android:fontFamily="@font/poppins"
+                android:hint="Edit Username"
+                android:inputType="text"
+                android:paddingStart="15dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
                 android:textColor="@color/white"
-                android:textSize="31sp"
-                android:textStyle="bold"
+                android:textColorHint="@color/white"
+                android:textCursorDrawable="@drawable/cursor_color"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.504"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profileEditImage" />
+                app:layout_constraintTop_toBottomOf="@+id/currentProfileImage" />
+
+            <EditText
+                android:id="@+id/editPassword"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_edit_text_background"
+                android:ems="10"
+                android:fontFamily="@font/poppins"
+                android:hint="Edit Password"
+                android:layout_marginTop="20dp"
+                android:inputType="textPassword"
+                android:password="true"
+                android:paddingStart="15dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:textCursorDrawable="@drawable/cursor_color"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.504"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editUsername" />
 
             <Button
                 android:id="@+id/profileEditSaveButton"
-                android:layout_width="150dp"
-                android:layout_height="80dp"
+                android:layout_width="140dp"
+                android:layout_height="60dp"
                 android:layout_marginStart="100dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="70dp"
                 android:layout_marginEnd="100dp"
                 android:background="@drawable/rounded_button"
-                android:backgroundTint="@color/primary_dark"
+                android:backgroundTint="@color/primary_purple"
                 android:scaleType="fitXY"
-                android:text="Save Changes"
+                android:text="Save"
+                android:textSize="20dp"
                 android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profileEditName" />
+                app:layout_constraintTop_toBottomOf="@+id/editPassword" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

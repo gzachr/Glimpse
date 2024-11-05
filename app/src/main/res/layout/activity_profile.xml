@@ -65,32 +65,86 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/user1" />
-
             <TextView
-                android:id="@+id/profileName"
-                android:layout_width="wrap_content"
+                android:id="@+id/profileNameLabel"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="176dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="177dp"
+                android:layout_marginStart="80dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="80dp"
                 android:fontFamily="@font/poppins_semibold"
-                android:text="user1"
+                android:text="Username"
                 android:textColor="@color/white"
                 android:textSize="31sp"
                 android:textStyle="bold"
+                android:textAlignment="viewStart"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/profileImage" />
+
+
+            <TextView
+                android:id="@+id/profileName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="80dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="80dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="user1"
+                android:textColor="@color/white"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:textAlignment="viewStart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profileNameLabel" />
+
+
+            <TextView
+                android:id="@+id/profilePasswordLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="80dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="80dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Password"
+                android:textColor="@color/white"
+                android:textSize="31sp"
+                android:textStyle="bold"
+                android:textAlignment="viewStart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profileName" />
+
+
+            <TextView
+                android:id="@+id/profilePassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="80dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="80dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="************"
+                android:textColor="@color/white"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:textAlignment="viewStart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profilePasswordLabel" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="100dp"
+                android:layout_marginTop="60dp"
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profileName">
+                app:layout_constraintTop_toBottomOf="@+id/profilePassword">
 
                 <ImageButton
                     android:id="@+id/profileEditButton"
