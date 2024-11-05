@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityGalleryBinding
 import Post
 import android.util.Log
+import android.view.View
 import com.mobdeve.s12.group8.glimpse.model.Reaction
 
 class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener {
@@ -30,7 +31,11 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
         if (usernameFilter == "none") {
             binding.recyclerViewPosts.adapter = GalleryAdapter(posts, this)
         } else {
-            binding.recyclerViewPosts.adapter = GalleryAdapter(filteredPosts, this)
+            if (filteredPosts.isNotEmpty()) {
+                binding.recyclerViewPosts.adapter = GalleryAdapter(filteredPosts, this)
+            } else {
+                binding.noPostsGalleryTextView.visibility = View.VISIBLE
+            }
         }
 
         binding.galleryMessageBtn.setOnClickListener {
