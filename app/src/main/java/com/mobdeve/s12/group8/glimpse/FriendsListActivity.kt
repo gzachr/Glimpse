@@ -17,6 +17,16 @@ class FriendsListActivity : AppCompatActivity(), FriendsListAdapter.OnFriendClic
         posts = intent.getParcelableArrayListExtra<Post>("data") ?: ArrayList()
         friends = ArrayList(posts.distinctBy { it.username })
 
+        val everyonePost = Post(
+            postImageId = -1,  // Use a placeholder ID if applicable
+            userImageId = R.drawable.friends_icon,
+            username = "none",
+            createdAt = "",
+            caption = "",
+            position = -1  // Use -1 or any other value that signifies a special case
+        )
+        friends.add(0, everyonePost)
+
         binding = ActivityFriendsListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

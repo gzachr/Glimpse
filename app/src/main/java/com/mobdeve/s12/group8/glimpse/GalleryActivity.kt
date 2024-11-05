@@ -45,6 +45,7 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
             val resultIntent = Intent(applicationContext, HomeActivity::class.java).apply {
                 putParcelableArrayListExtra("updated_posts", posts)
                 putParcelableArrayListExtra("updated_reactions", reactions)
+                putExtra("fromGallery", 1)
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             setResult(RESULT_OK, resultIntent)

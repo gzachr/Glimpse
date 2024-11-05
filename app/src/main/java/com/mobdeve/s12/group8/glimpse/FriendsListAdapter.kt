@@ -2,6 +2,7 @@ package com.mobdeve.s12.group8.glimpse
 
 import Post
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -20,7 +21,9 @@ class FriendsListAdapter(
 
     inner class FriendsViewHolder(private val binding: ItemFriendsBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindData(post: Post) {
-            //binding.friendImage.setImageResource(post.userImageId)
+            if (post.username == "user1" || post.username == "none") {
+                binding.removeFriend.visibility = View.GONE
+            }
 
 
             Glide.with(binding.friendImage.context)
@@ -28,7 +31,11 @@ class FriendsListAdapter(
                 .apply(RequestOptions().transform(RoundedCorners(100)))
                 .into(binding.friendImage)
 
-            binding.friendUsername.text = if (post.username == "user1") "You" else post.username
+            binding.friendUsername.text = when (post.username) {
+                "user1" -> "You"
+                "none" -> "Everyone"
+                else -> post.username
+            }
         }
     }
 
@@ -50,6 +57,4 @@ class FriendsListAdapter(
             listener.onFriendClick(username)
         }
     }
-
-
 }
