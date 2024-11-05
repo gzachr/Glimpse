@@ -57,6 +57,51 @@ object DataHelper {
                 R.drawable.post12, R.drawable.user2, "user2", "22h ago", "she cheated on me..",9
             )
         )
+        data.add(
+            Post(
+                R.drawable.post4, R.drawable.user6, "user6", "12h ago", "let there be light",10
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post15, R.drawable.user09, "user09", "13h ago", "BIBIEEEE",11
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post16, R.drawable.user5, "user5", "14h ago", "Catto Catto Catto",12
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post17, R.drawable.user4, "user4", "14h ago", "do not kill yourself",13
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post11, R.drawable.user6, "user6", "15h ago", "Braving the darkness",14
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post18, R.drawable.user10, "user10", "17h ago", "its deep, bros",15
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post13, R.drawable.user6, "user6", "18h ago", "Scrub Daddy works",16
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post19, R.drawable.user3, "user3", "19h ago", "Slep",17
+            )
+        )
+        data.add(
+            Post(
+                R.drawable.post14, R.drawable.user6, "user6", "20h ago", "Scrub Daddy Test",18
+            )
+        )
         return data
     }
 
