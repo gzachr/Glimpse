@@ -3,6 +3,7 @@ package com.mobdeve.s12.group8.glimpse
 import Post
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -59,7 +60,11 @@ class FeedActivity : AppCompatActivity(), FeedAdapter.PostDeleteCallback {
         if (usernameFilter == "none") {
             recyclerView.adapter = FeedAdapter(posts, reactions, this)
         } else {
-            recyclerView.adapter = FeedAdapter(filteredPosts, reactions, this)
+            if (filteredPosts.isNotEmpty()) {
+                recyclerView.adapter = FeedAdapter(filteredPosts, reactions, this)
+            } else {
+                binding.noPostsTextView.visibility = View.VISIBLE
+            }
         }
 
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -163,5 +168,9 @@ class FeedActivity : AppCompatActivity(), FeedAdapter.PostDeleteCallback {
 
         filteredPosts = ArrayList(posts.filter { it.username == usernameFilter })
         recyclerView.adapter?.notifyDataSetChanged()
+
+        if (filteredPosts.isEmpty()) {
+            binding.noPostsTextView.visibility = View.VISIBLE
+        }
     }
 }

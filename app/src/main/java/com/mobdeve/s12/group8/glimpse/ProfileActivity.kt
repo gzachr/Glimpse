@@ -1,6 +1,7 @@
 package com.mobdeve.s12.group8.glimpse
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -23,5 +24,13 @@ class ProfileActivity : AppCompatActivity() {
             val intent = Intent(applicationContext, ProfileEditActivity::class.java)
             startActivity(intent)
         }
+        binding.profileEditLabel.setOnClickListener{
+            val intent = Intent(applicationContext, ProfileEditActivity::class.java)
+            startActivity(intent)
+        }
+        Glide.with(this)
+            .load(R.drawable.user1)
+            .apply(RequestOptions().transform(RoundedCorners(1000)))
+            .into(binding.profileImage)
     }
 }

@@ -17,6 +17,32 @@ class FriendsListActivity : AppCompatActivity(), FriendsListAdapter.OnFriendClic
         posts = intent.getParcelableArrayListExtra<Post>("data") ?: ArrayList()
         friends = ArrayList(posts.distinctBy { it.username })
 
+        val userPost = friends.find { it.username == "user1" }
+        if (userPost != null) {
+            friends.remove(userPost)
+            friends.add(userPost)
+        } else {
+            val user1 = Post(
+                postImageId = -1,
+                userImageId = R.drawable.user1,
+                username = "user1",
+                createdAt = "",
+                caption = "",
+                position = -1
+            )
+            friends.add(user1)
+        }
+
+        val everyonePost = Post(
+            postImageId = -1,
+            userImageId = R.drawable.friends_icon,
+            username = "none",
+            createdAt = "",
+            caption = "",
+            position = -1
+        )
+        friends.add(0, everyonePost)
+
         binding = ActivityFriendsListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

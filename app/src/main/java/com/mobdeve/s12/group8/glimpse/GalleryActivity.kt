@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityGalleryBinding
 import Post
 import android.util.Log
+import android.view.View
 import com.mobdeve.s12.group8.glimpse.model.Reaction
 
 class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener {
@@ -32,9 +33,16 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
         if (usernameFilter == "none") {
             binding.recyclerViewPosts.adapter = GalleryAdapter(posts, this)
         } else {
-            binding.recyclerViewPosts.adapter = GalleryAdapter(filteredPosts, this)
+            if (filteredPosts.isNotEmpty()) {
+                binding.recyclerViewPosts.adapter = GalleryAdapter(filteredPosts, this)
+            } else {
+                binding.noPostsGalleryTextView.visibility = View.VISIBLE
+            }
         }
-
+        binding.reactionExitButton.setOnClickListener {
+            val intent = Intent(applicationContext, ProfileActivity::class.java)
+            startActivity(intent)
+        }
         binding.galleryMessageBtn.setOnClickListener {
             val newIntent = Intent(this, ReactionActivity::class.java).apply {
                 putParcelableArrayListExtra("data", posts)
@@ -47,6 +55,7 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
             val resultIntent = Intent(applicationContext, HomeActivity::class.java).apply {
                 putParcelableArrayListExtra("updated_posts", posts)
                 putParcelableArrayListExtra("updated_reactions", reactions)
+                putExtra("fromGallery", 1)
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             setResult(RESULT_OK, resultIntent)

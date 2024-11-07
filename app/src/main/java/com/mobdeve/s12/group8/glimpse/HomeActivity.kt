@@ -155,6 +155,7 @@ class HomeActivity: AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val checkFilter = intent.getStringExtra("usernameFilter") ?: "none"
+        val checkFromGallery = intent.getIntExtra("fromGallery", -1)
 
         intent.let {
             val updatedPosts = it.getParcelableArrayListExtra<Post>("updated_posts")
@@ -167,30 +168,23 @@ class HomeActivity: AppCompatActivity() {
                 reactions.clear()
                 reactions.addAll(newReactions)
             }
+        }
 
-            val position = it.getIntExtra("open_feed_at_position", -1)
-            if (position != -1) {
+        if (checkFromGallery == -1) {
+            intent.let {
+                val position = it.getIntExtra("open_feed_at_position", -1)
                 val feedIntent = Intent(applicationContext, FeedActivity::class.java).apply {
                     putExtra("data", posts)
                     putExtra("reactions", reactions)
-                    putExtra("position", position)
+                    if (position != -1) {
+                        putExtra("position", position)
+                    }
                     if (checkFilter != "none") {
                         val filterUsername = it.getStringExtra("usernameFilter")
                         putExtra("filterUsername", filterUsername)
                     }
                 }
                 startActivityForResult(feedIntent, REQUEST_CODE_FEED)
-            } else {
-                val feedIntent = Intent(applicationContext, FeedActivity::class.java).apply {
-                    putExtra("data", posts)
-                    putExtra("reactions", reactions)
-                    if (checkFilter != "none") {
-                        val filterUsername = it.getStringExtra("usernameFilter")
-                        putExtra("filterUsername", filterUsername)
-                    }
-                }
-                startActivityForResult(feedIntent, REQUEST_CODE_FEED)
-
             }
         }
     }

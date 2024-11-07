@@ -71,6 +71,20 @@
             android:layout_height="match_parent"
             android:layout_marginTop="60dp">
 
+            <TextView
+                android:id="@+id/noPostsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="user1 has not posted yet."
+                android:textColor="@color/white"
+                android:textSize="17sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@+id/feedBottomNavLl"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/feedRv" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/feedRv"
                 android:layout_width="match_parent"
