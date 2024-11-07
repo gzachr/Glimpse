@@ -20,9 +20,6 @@ class FriendsListAdapter(
 
     inner class FriendsViewHolder(private val binding: ItemFriendsBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindData(post: Post) {
-            //binding.friendImage.setImageResource(post.userImageId)
-
-
             Glide.with(binding.friendImage.context)
                 .load(post.userImageId)
                 .apply(RequestOptions().transform(RoundedCorners(100)))
@@ -50,6 +47,4 @@ class FriendsListAdapter(
             listener.onFriendClick(username)
         }
     }
-
-
 }

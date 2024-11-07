@@ -10,6 +10,8 @@ import androidx.core.content.ContextCompat
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityMainBinding
 import android.Manifest
 import androidx.core.app.ActivityCompat
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +20,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         const val CAMERA_PERMISSION_REQUEST_CODE = 100
     }
+
+    val db = Firebase.firestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

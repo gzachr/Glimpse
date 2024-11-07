@@ -20,6 +20,8 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
         binding = ActivityGalleryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+
         posts = intent.getParcelableArrayListExtra<Post>("data") ?: ArrayList()
         reactions = intent.getParcelableArrayListExtra<Reaction>("reactions") ?: ArrayList()
         val usernameFilter = intent.getStringExtra("galleryFilter") ?: "none"
