@@ -1,6 +1,6 @@
 package com.mobdeve.s12.group8.glimpse
 
-import Post
+import OldPost
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -15,7 +15,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityHomeBinding
-import com.mobdeve.s12.group8.glimpse.model.Reaction
+import com.mobdeve.s12.group8.glimpse.model.OldReaction
 
 class HomeActivity: AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
@@ -137,14 +137,14 @@ class HomeActivity: AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == REQUEST_CODE_FEED && resultCode == RESULT_OK) {
-            val updatedPosts = data?.getParcelableArrayListExtra<Post>("updated_posts")
+            val updatedPosts = data?.getParcelableArrayListExtra<OldPost>("updated_posts")
             updatedPosts?.let {
                 posts.clear()
                 posts.addAll(it)
 
             }
 
-            val updatedRequests = data?.getParcelableArrayListExtra<Reaction>("updated_reactions")
+            val updatedRequests = data?.getParcelableArrayListExtra<OldReaction>("updated_reactions")
             updatedRequests?.let{
                 reactions.clear()
                 reactions.addAll(it)
@@ -158,12 +158,12 @@ class HomeActivity: AppCompatActivity() {
         val checkFromGallery = intent.getIntExtra("fromGallery", -1)
 
         intent.let {
-            val updatedPosts = it.getParcelableArrayListExtra<Post>("updated_posts")
+            val updatedPosts = it.getParcelableArrayListExtra<OldPost>("updated_posts")
             updatedPosts?.let { newPosts ->
                 posts.clear()
                 posts.addAll(newPosts)
             }
-            val updatedReactions = it.getParcelableArrayListExtra<Reaction>("updated_reactions")
+            val updatedReactions = it.getParcelableArrayListExtra<OldReaction>("updated_reactions")
             updatedReactions?.let { newReactions ->
                 reactions.clear()
                 reactions.addAll(newReactions)

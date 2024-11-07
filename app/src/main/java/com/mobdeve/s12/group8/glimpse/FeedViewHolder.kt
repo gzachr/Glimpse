@@ -4,36 +4,30 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
-import Post
-import com.bumptech.glide.request.target.Target
+import OldPost
 
 class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding.root) {
     private var stateFlag: Boolean = false
     private val imageUri: Uri = Uri.parse("https://todocodigo.net/img/626.jpg")
 
     @SuppressLint("ClickableViewAccessibility")
-    fun bind(post: Post) {
-        if (post.username != "user1") {
+    fun bind(oldPost: OldPost) {
+        if (oldPost.username != "user1") {
             binding.deleteBtn.visibility = View.GONE
         }
 
         Glide.with(binding.feedUserIv.context)
-            .load(post.userImageId)
+            .load(oldPost.userImageId)
             .apply(RequestOptions().transform(RoundedCorners(50)))
             .into(binding.feedUserIv)
 
@@ -46,20 +40,20 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
         }
 
         Glide.with(binding.feedPostIv.context)
-            .load(post.postImageId)
+            .load(oldPost.postImageId)
             .apply(RequestOptions().transform(RoundedCorners(16)))
             .into(binding.feedPostIv)
 
-        binding.feedUsernameTv.text = post.username
-        binding.feedCreatedAtTv.text = post.createdAt
-        binding.feedCaptionTv.text = post.caption
+        binding.feedUsernameTv.text = oldPost.username
+        binding.feedCreatedAtTv.text = oldPost.createdAt
+        binding.feedCaptionTv.text = oldPost.caption
 
         //on double tap change to location view
         val gestureDetector =
             GestureDetector(binding.root.context, object : GestureDetector.SimpleOnGestureListener() {
                 override fun onDoubleTap(e: MotionEvent): Boolean {
                     val newImage = if (stateFlag) {
-                        post.postImageId // Use the original image
+                        oldPost.postImageId // Use the original image
                     } else {
                         R.drawable.map // Use the map image
                     }

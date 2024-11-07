@@ -1,44 +1,14 @@
-import android.os.Parcel
-import android.os.Parcelable
+package com.mobdeve.s12.group8.glimpse.model
+
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.ServerTimestamp
+import java.util.Date
 
 data class Post(
-    var postImageId: Int,
-    var userImageId: Int,
-    var username: String,
-    var createdAt: String,
-    var caption: String,
-    var position: Int
-) : Parcelable {
-
-    constructor(parcel: Parcel) : this(
-        parcel.readInt(),
-        parcel.readInt(),
-        parcel.readString() ?: "",
-        parcel.readString() ?: "",
-        parcel.readString() ?: "",
-        parcel.readInt()
-    )
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(postImageId)
-        parcel.writeInt(userImageId)
-        parcel.writeString(username)
-        parcel.writeString(createdAt)
-        parcel.writeString(caption)
-        parcel.writeInt(position)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<Post> {
-        override fun createFromParcel(parcel: Parcel): Post {
-            return Post(parcel)
-        }
-
-        override fun newArray(size: Int): Array<Post?> {
-            return arrayOfNulls(size)
-        }
-    }
+    var imgUri: String,
+    var location: String, //subject to change datatype
+    var user: DocumentReference,
+    @ServerTimestamp val createdAt: Date?,
+    var caption: String
+) {
 }

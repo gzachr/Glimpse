@@ -1,6 +1,6 @@
 package com.mobdeve.s12.group8.glimpse
 
-import Post
+import OldPost
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +11,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.mobdeve.s12.group8.glimpse.databinding.ItemFriendsBinding
 
 class FriendsListAdapter(
-    private val postList: ArrayList<Post>,
+    private val oldPostList: ArrayList<OldPost>,
     private val listener: OnFriendClickListener
 ) : RecyclerView.Adapter<FriendsListAdapter.FriendsViewHolder>() {
 
@@ -20,18 +20,18 @@ class FriendsListAdapter(
     }
 
     inner class FriendsViewHolder(private val binding: ItemFriendsBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bindData(post: Post) {
-            if (post.username == "user1" || post.username == "none") {
+        fun bindData(oldPost: OldPost) {
+            if (oldPost.username == "user1" || oldPost.username == "none") {
                 binding.removeFriend.visibility = View.GONE
             }
 
 
             Glide.with(binding.friendImage.context)
-                .load(post.userImageId)
+                .load(oldPost.userImageId)
                 .apply(RequestOptions().transform(RoundedCorners(100)))
                 .into(binding.friendImage)
 
-            binding.friendUsername.text = if (post.username == "user1") "You" else post.username
+            binding.friendUsername.text = if (oldPost.username == "user1") "You" else oldPost.username
         }
     }
 
@@ -41,11 +41,11 @@ class FriendsListAdapter(
     }
 
     override fun getItemCount(): Int {
-        return postList.size
+        return oldPostList.size
     }
 
     override fun onBindViewHolder(holder: FriendsViewHolder, position: Int) {
-        val post = postList[position]
+        val post = oldPostList[position]
         holder.bindData(post)
 
         holder.itemView.setOnClickListener {
