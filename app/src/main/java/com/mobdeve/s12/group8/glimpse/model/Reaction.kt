@@ -8,4 +8,6 @@ data class Reaction (
     var reactor: DocumentReference,
     var post: DocumentReference,
     @ServerTimestamp val date: Date
-)
+) {
+
+}

@@ -51,6 +51,27 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <EditText
+        android:id="@+id/regEmailEt"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_edit_text_background"
+        android:ems="10"
+        android:fontFamily="@font/poppins"
+        android:hint="Email"
+        android:inputType="text"
+        android:paddingStart="15dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:textCursorDrawable="@drawable/cursor_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/regUsernameEt" />
+
+    <EditText
         android:id="@+id/regPasswordEt"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
@@ -67,30 +88,9 @@
         android:textColorHint="@color/white"
         android:textCursorDrawable="@drawable/cursor_color"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/regUsernameEt" />
-
-    <EditText
-        android:id="@+id/regConfirmPassEt"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/rounded_edit_text_background"
-        android:ems="10"
-        android:fontFamily="@font/poppins"
-        android:hint="Confirm Password"
-        android:inputType="textPassword"
-        android:paddingStart="15dp"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        android:textCursorDrawable="@drawable/cursor_color"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/regPasswordEt" />
+        app:layout_constraintTop_toBottomOf="@+id/regEmailEt" />
 
     <Button
         android:id="@+id/regContinueBtn"
@@ -108,7 +108,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/regConfirmPassEt" />
+        app:layout_constraintTop_toBottomOf="@+id/regPasswordEt" />
 
     <TextView
         android:id="@+id/regLoginRedirectTv"
