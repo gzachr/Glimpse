@@ -41,6 +41,9 @@ class MainActivity : AppCompatActivity() {
         if(auth.currentUser != null) {
             // navigate to main activity already
             val intent = Intent(this, HomeActivity::class.java)
+            intent.apply {
+                //append needed user info
+            }
             startActivity(intent)
             finish()
         } else {

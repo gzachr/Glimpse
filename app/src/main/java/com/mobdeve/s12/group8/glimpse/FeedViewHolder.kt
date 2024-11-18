@@ -15,10 +15,17 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
 import OldPost
+import android.util.Log
+import androidx.fragment.app.FragmentActivity
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 
 class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding.root) {
     private var stateFlag: Boolean = false
     private val imageUri: Uri = Uri.parse("https://todocodigo.net/img/626.jpg")
+    private var mapFragment: SupportMapFragment? = null
 
     @SuppressLint("ClickableViewAccessibility")
     fun bind(oldPost: OldPost) {
@@ -32,11 +39,11 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
             .into(binding.feedUserIv)
 
         // set height = to width so that image will show up as square
-        binding.feedPostIv.post {
-            val width = binding.feedPostIv.width
-            val layoutParams = binding.feedPostIv.layoutParams
+        binding.feedCv.post {
+            val width = binding.feedCv.width
+            val layoutParams = binding.feedCv.layoutParams
             layoutParams.height = width
-            binding.feedPostIv.layoutParams = layoutParams
+            binding.feedCv.layoutParams = layoutParams
         }
 
         Glide.with(binding.feedPostIv.context)
@@ -52,24 +59,72 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
         val gestureDetector =
             GestureDetector(binding.root.context, object : GestureDetector.SimpleOnGestureListener() {
                 override fun onDoubleTap(e: MotionEvent): Boolean {
-                    val newImage = if (stateFlag) {
-                        oldPost.postImageId // Use the original image
-                    } else {
-                        R.drawable.map // Use the map image
-                    }
+                    toggleMap()
 
                     // Start the image change with animation
-                    animateImageChange(binding.feedPostIv, newImage)
-                    stateFlag = !stateFlag
+//                    animateImageChange(binding.feedPostIv, newImage)
+//                    stateFlag = !stateFlag
 
                     return true
                 }
             })
 
-        binding.feedCv.setOnTouchListener { _, motionEvent ->
+//        binding.feedCv.setOnTouchListener { _, motionEvent ->
+//            gestureDetector.onTouchEvent(motionEvent)
+//            true
+//        }
+
+        binding.transparentOverlay.setOnTouchListener { _, motionEvent ->
             gestureDetector.onTouchEvent(motionEvent)
+            Log.d("TEST", "framelayout is clicked")
             true
         }
+
+    }
+
+    private fun toggleMap() {
+        val fragmentManager = (binding.root.context as FragmentActivity).supportFragmentManager
+
+        if (stateFlag) {
+            // Show the image and hide/remove the map fragment
+            binding.feedPostIv.visibility = View.VISIBLE
+            binding.mapContainer.visibility = View.GONE
+
+            mapFragment?.let {
+                fragmentManager.beginTransaction().hide(it).commit()
+            }
+
+        } else {
+            binding.feedPostIv.visibility = View.GONE
+            binding.mapContainer.visibility = View.VISIBLE
+            //TODO: adjust with actual post coordinates
+            val marker = LatLng(14.56494073682104, 120.99320813598213)
+
+            // Only create a new SupportMapFragment if one doesn't exist
+            if (mapFragment == null) {
+                mapFragment = SupportMapFragment.newInstance().also { fragment ->
+                    fragment.getMapAsync { googleMap ->
+                        // Customize the map, add markers, etc.
+                        googleMap.addMarker(
+                            MarkerOptions()
+                                .position(marker)
+                                .title("Marker")
+                        )
+                        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker, 15f)
+                        googleMap.moveCamera(cameraUpdate)
+                        googleMap.uiSettings.setAllGesturesEnabled(false)
+                    }
+                    fragmentManager.beginTransaction().replace(binding.mapContainer.id, fragment)
+                        .commit()
+                }
+            }
+            else {
+                // Show the map fragment if it already exists
+                fragmentManager.beginTransaction().show(mapFragment!!).commit()
+            }
+
+        }
+        stateFlag = !stateFlag
     }
 
     private fun animateImageChange(imageView: ImageView, imageResId: Int) {

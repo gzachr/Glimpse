@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -40,6 +41,7 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -89,4 +91,8 @@ dependencies {
     implementation (libs.play.services.auth)
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation(libs.google.firebase.analytics)
+
+    //maps
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+
 }

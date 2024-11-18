@@ -43,6 +43,7 @@ class HomeActivity: AppCompatActivity() {
                 putExtra("reactions", reactions)
             }
             startActivityForResult(intent, REQUEST_CODE_FEED)  // Use startActivityForResult
+
         }
 
         binding.postExitBtn.setOnClickListener {
