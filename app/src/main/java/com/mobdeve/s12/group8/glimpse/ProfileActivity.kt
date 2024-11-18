@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityProfileBinding
 
 class ProfileActivity : AppCompatActivity() {
@@ -32,5 +33,11 @@ class ProfileActivity : AppCompatActivity() {
             .load(R.drawable.user1)
             .apply(RequestOptions().transform(RoundedCorners(1000)))
             .into(binding.profileImage)
+
+        binding.profileLogoutBtn.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            startActivity(Intent(this@ProfileActivity, MainActivity::class.java))
+            finishAffinity()
+        }
     }
 }
