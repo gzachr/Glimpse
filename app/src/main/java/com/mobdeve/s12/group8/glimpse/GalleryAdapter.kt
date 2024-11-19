@@ -1,19 +1,13 @@
 package com.mobdeve.s12.group8.glimpse
 
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.mobdeve.s12.group8.glimpse.databinding.ActivityGalleryBinding
 import com.mobdeve.s12.group8.glimpse.databinding.ItemPostBinding
-import com.mobdeve.s12.group8.glimpse.databinding.ItemReactionBinding
-import Post
-import com.mobdeve.s12.group8.glimpse.model.Reaction
+import OldPost
 
 class GalleryAdapter(
-    private val postList: ArrayList<Post>,
+    private val oldPostList: ArrayList<OldPost>,
     private val listener: OnPostClickListener
 ) : RecyclerView.Adapter<GalleryAdapter.PostViewHolder>() {
 
@@ -22,8 +16,8 @@ class GalleryAdapter(
     }
 
     inner class PostViewHolder(private val binding: ItemPostBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bindData(post: Post) {
-            binding.imageViewPost.setImageResource(post.postImageId)
+        fun bindData(oldPost: OldPost) {
+            binding.imageViewPost.setImageResource(oldPost.postImageId)
         }
     }
 
@@ -33,11 +27,11 @@ class GalleryAdapter(
     }
 
     override fun getItemCount(): Int {
-        return postList.size
+        return oldPostList.size
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val post = postList[position]
+        val post = oldPostList[position]
         holder.bindData(post)
 
         holder.itemView.setOnClickListener {

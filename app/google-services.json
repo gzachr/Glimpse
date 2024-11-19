@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "127297584919",
+    "project_id": "glimpse-f1318",
+    "storage_bucket": "glimpse-f1318.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:127297584919:android:52a873e855c02f0e0c4152",
+        "android_client_info": {
+          "package_name": "com.mobdeve.s12.group8.glimpse"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoE1_ecAfIJEgP-wDXZi8MCuVZUDpSjMc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

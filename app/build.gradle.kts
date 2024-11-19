@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -39,6 +41,7 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -63,6 +66,9 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.auth.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -80,4 +86,13 @@ dependencies {
     implementation ("com.github.bumptech.glide:glide:4.15.0")
     implementation ("com.google.android.material:material:1.6.1")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.0")
+
+    //firebase
+    implementation (libs.play.services.auth)
+    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation(libs.google.firebase.analytics)
+
+    //maps
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+
 }

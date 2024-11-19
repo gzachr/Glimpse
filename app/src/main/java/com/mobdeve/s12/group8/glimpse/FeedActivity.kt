@@ -1,6 +1,6 @@
 package com.mobdeve.s12.group8.glimpse
 
-import Post
+import OldPost
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -11,12 +11,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityFeedBinding
-import com.mobdeve.s12.group8.glimpse.model.Reaction
+import com.mobdeve.s12.group8.glimpse.model.OldReaction
 
 class FeedActivity : AppCompatActivity(), FeedAdapter.PostDeleteCallback {
-    private var posts: ArrayList<Post> = ArrayList()
-    private var filteredPosts: ArrayList<Post> = ArrayList()
-    private var reactions: ArrayList<Reaction> = ArrayList()
+    private var oldPosts: ArrayList<OldPost> = ArrayList()
+    private var filteredOldPosts: ArrayList<OldPost> = ArrayList()
+    private var oldReactions: ArrayList<OldReaction> = ArrayList()
     private lateinit var usernameFilter: String
     private lateinit var binding: ActivityFeedBinding
     private lateinit var recyclerView: RecyclerView
@@ -31,9 +31,9 @@ class FeedActivity : AppCompatActivity(), FeedAdapter.PostDeleteCallback {
             position?.let {
                 if (it >= 0) {
                     if (usernameFilter != "none") {
-                        val originalPost = posts.getOrNull(position)
+                        val originalPost = oldPosts.getOrNull(position)
                         if (originalPost != null) {
-                            val newPosition = filteredPosts.indexOf(originalPost)
+                            val newPosition = filteredOldPosts.indexOf(originalPost)
                             if (newPosition >= 0) {
                                 recyclerView.scrollToPosition(newPosition)
                             }
@@ -48,20 +48,20 @@ class FeedActivity : AppCompatActivity(), FeedAdapter.PostDeleteCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        posts = intent.getParcelableArrayListExtra<Post>("data") ?: ArrayList()
-        reactions = intent.getParcelableArrayListExtra<Reaction>("reactions") ?: ArrayList()
+        oldPosts = intent.getParcelableArrayListExtra<OldPost>("data") ?: ArrayList()
+        oldReactions = intent.getParcelableArrayListExtra<OldReaction>("reactions") ?: ArrayList()
         usernameFilter = intent.getStringExtra("filterUsername") ?: "none"
-        filteredPosts = ArrayList(posts.filter { it.username == usernameFilter })
+        filteredOldPosts = ArrayList(oldPosts.filter { it.username == usernameFilter })
 
         binding = ActivityFeedBinding.inflate(layoutInflater)
         setContentView(binding.root)
         recyclerView = binding.feedRv
 
         if (usernameFilter == "none") {
-            recyclerView.adapter = FeedAdapter(posts, reactions, this)
+            recyclerView.adapter = FeedAdapter(oldPosts, oldReactions, this)
         } else {
-            if (filteredPosts.isNotEmpty()) {
-                recyclerView.adapter = FeedAdapter(filteredPosts, reactions, this)
+            if (filteredOldPosts.isNotEmpty()) {
+                recyclerView.adapter = FeedAdapter(filteredOldPosts, oldReactions, this)
             } else {
                 binding.noPostsTextView.visibility = View.VISIBLE
             }
@@ -76,9 +76,9 @@ class FeedActivity : AppCompatActivity(), FeedAdapter.PostDeleteCallback {
 
         if (position >= 0) {
             if (usernameFilter != "none") {
-                val originalPost = posts.getOrNull(position)
+                val originalPost = oldPosts.getOrNull(position)
                 if (originalPost != null) {
-                    val newPosition = filteredPosts.indexOf(originalPost)
+                    val newPosition = filteredOldPosts.indexOf(originalPost)
                     if (newPosition >= 0) {
                         recyclerView.scrollToPosition(newPosition)
                     }
@@ -103,8 +103,8 @@ class FeedActivity : AppCompatActivity(), FeedAdapter.PostDeleteCallback {
 
         binding.feedViewAllBtn.setOnClickListener {
             val newIntent = Intent(this, GalleryActivity::class.java).apply {
-                putParcelableArrayListExtra("data", posts)
-                putParcelableArrayListExtra("reactions", reactions)
+                putParcelableArrayListExtra("data", oldPosts)
+                putParcelableArrayListExtra("reactions", oldReactions)
                 putExtra("galleryFilter", usernameFilter)
             }
             newIntentActivity.launch(newIntent)
@@ -117,16 +117,16 @@ class FeedActivity : AppCompatActivity(), FeedAdapter.PostDeleteCallback {
 
         binding.feedMessageBtn.setOnClickListener {
             val newIntent = Intent(this, ReactionActivity::class.java).apply {
-                putParcelableArrayListExtra("data", posts)
-                putParcelableArrayListExtra("reactions", reactions)
+                putParcelableArrayListExtra("data", oldPosts)
+                putParcelableArrayListExtra("reactions", oldReactions)
             }
             newIntentActivity.launch(newIntent)
         }
 
         binding.feedReturnToHomeBtn.setOnClickListener {
             val resultIntent = Intent().apply {
-                putParcelableArrayListExtra("updated_posts", posts)
-                putParcelableArrayListExtra("updated_reactions", reactions)
+                putParcelableArrayListExtra("updated_posts", oldPosts)
+                putParcelableArrayListExtra("updated_reactions", oldReactions)
             }
             setResult(RESULT_OK, resultIntent)
             finish()
@@ -134,7 +134,7 @@ class FeedActivity : AppCompatActivity(), FeedAdapter.PostDeleteCallback {
 
         binding.feedFriendsBtn.setOnClickListener {
             val intent = Intent(applicationContext, FriendsListActivity::class.java)
-            intent.putExtra("data", posts)
+            intent.putExtra("data", oldPosts)
             startActivity(intent)
         }
     }
@@ -147,29 +147,29 @@ class FeedActivity : AppCompatActivity(), FeedAdapter.PostDeleteCallback {
 
     private fun returnUpdatedData() {
         val resultIntent = Intent().apply {
-            putParcelableArrayListExtra("updated_posts", posts)
-            putParcelableArrayListExtra("updated_reactions", reactions)
+            putParcelableArrayListExtra("updated_posts", oldPosts)
+            putParcelableArrayListExtra("updated_reactions", oldReactions)
         }
         setResult(RESULT_OK, resultIntent)
     }
 
     override fun onPostDeleted(position: Int, postId: Int) {
-        val deletedPostIndex = posts.indexOfFirst { it.postImageId == postId }
+        val deletedPostIndex = oldPosts.indexOfFirst { it.postImageId == postId }
 
         if (deletedPostIndex >= 0) {
-            posts.removeAt(deletedPostIndex)
+            oldPosts.removeAt(deletedPostIndex)
 
-            posts.forEachIndexed { index, post ->
+            oldPosts.forEachIndexed { index, post ->
                 if (index >= deletedPostIndex) {
                     post.position -= 1
                 }
             }
         }
 
-        filteredPosts = ArrayList(posts.filter { it.username == usernameFilter })
+        filteredOldPosts = ArrayList(oldPosts.filter { it.username == usernameFilter })
         recyclerView.adapter?.notifyDataSetChanged()
 
-        if (filteredPosts.isEmpty()) {
+        if (filteredOldPosts.isEmpty()) {
             binding.noPostsTextView.visibility = View.VISIBLE
         }
     }

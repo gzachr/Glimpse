@@ -1,6 +1,6 @@
 package com.mobdeve.s12.group8.glimpse
 
-import Post
+import OldPost
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -8,21 +8,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityFriendsListBinding
 
 class FriendsListActivity : AppCompatActivity(), FriendsListAdapter.OnFriendClickListener {
-    private var posts: ArrayList<Post> = ArrayList()
-    private var friends: ArrayList<Post> = ArrayList()
+    private var oldPosts: ArrayList<OldPost> = ArrayList()
+    private var friends: ArrayList<OldPost> = ArrayList()
     private lateinit var binding: ActivityFriendsListBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        posts = intent.getParcelableArrayListExtra<Post>("data") ?: ArrayList()
-        friends = ArrayList(posts.distinctBy { it.username })
+        oldPosts = intent.getParcelableArrayListExtra<OldPost>("data") ?: ArrayList()
+        friends = ArrayList(oldPosts.distinctBy { it.username })
 
         val userPost = friends.find { it.username == "user1" }
         if (userPost != null) {
             friends.remove(userPost)
             friends.add(userPost)
         } else {
-            val user1 = Post(
+            val user1 = OldPost(
                 postImageId = -1,
                 userImageId = R.drawable.user1,
                 username = "user1",
@@ -33,7 +33,7 @@ class FriendsListActivity : AppCompatActivity(), FriendsListAdapter.OnFriendClic
             friends.add(user1)
         }
 
-        val everyonePost = Post(
+        val everyoneOldPost = OldPost(
             postImageId = -1,
             userImageId = R.drawable.friends_icon,
             username = "none",
@@ -41,7 +41,7 @@ class FriendsListActivity : AppCompatActivity(), FriendsListAdapter.OnFriendClic
             caption = "",
             position = -1
         )
-        friends.add(0, everyonePost)
+        friends.add(0, everyoneOldPost)
 
         binding = ActivityFriendsListBinding.inflate(layoutInflater)
         setContentView(binding.root)

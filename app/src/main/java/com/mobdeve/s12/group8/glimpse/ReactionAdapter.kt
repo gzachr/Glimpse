@@ -1,14 +1,13 @@
 package com.mobdeve.s12.group8.glimpse
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.mobdeve.s12.group8.glimpse.databinding.ItemReactionBinding
-import com.mobdeve.s12.group8.glimpse.model.Reaction
+import com.mobdeve.s12.group8.glimpse.model.OldReaction
 
 class ReactionAdapter(
-    private val data: ArrayList<Reaction>,
+    private val data: ArrayList<OldReaction>,
     private val listener: OnNotificationsClickListener
 ) : RecyclerView.Adapter<ReactionViewHolder>() {
 

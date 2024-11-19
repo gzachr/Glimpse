@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
-import Post
-import com.mobdeve.s12.group8.glimpse.model.Reaction
+import OldPost
+import com.mobdeve.s12.group8.glimpse.model.OldReaction
 
-class FeedAdapter(private val data: ArrayList<Post>, private val reactions: ArrayList<Reaction>,  private val postDeleteCallback: PostDeleteCallback): Adapter<FeedViewHolder>() {
+class FeedAdapter(private val data: ArrayList<OldPost>, private val oldReactions: ArrayList<OldReaction>, private val postDeleteCallback: PostDeleteCallback): Adapter<FeedViewHolder>() {
 
     interface PostDeleteCallback {
         fun onPostDeleted(position: Int, postId: Int)
@@ -26,9 +26,9 @@ class FeedAdapter(private val data: ArrayList<Post>, private val reactions: Arra
             val removedPostId = removedPost.postImageId
 
             data.removeAt(position)
-            reactions.removeAll { reaction -> reaction.postImageId == removedPostId }
+            oldReactions.removeAll { reaction -> reaction.postImageId == removedPostId }
 
-            reactions.forEach { reaction ->
+            oldReactions.forEach { reaction ->
                 reaction.position -= 1
             }
 

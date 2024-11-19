@@ -5,34 +5,35 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityGalleryBinding
-import Post
-import android.util.Log
+import OldPost
 import android.view.View
-import com.mobdeve.s12.group8.glimpse.model.Reaction
+import com.mobdeve.s12.group8.glimpse.model.OldReaction
 
 class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener {
     private lateinit var binding: ActivityGalleryBinding
-    private var posts: ArrayList<Post> = ArrayList()
-    private var filteredPosts: ArrayList<Post> = ArrayList()
-    private var reactions: ArrayList<Reaction> = ArrayList()
+    private var oldPosts: ArrayList<OldPost> = ArrayList()
+    private var filteredOldPosts: ArrayList<OldPost> = ArrayList()
+    private var oldReactions: ArrayList<OldReaction> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGalleryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        posts = intent.getParcelableArrayListExtra<Post>("data") ?: ArrayList()
-        reactions = intent.getParcelableArrayListExtra<Reaction>("reactions") ?: ArrayList()
+
+
+        oldPosts = intent.getParcelableArrayListExtra<OldPost>("data") ?: ArrayList()
+        oldReactions = intent.getParcelableArrayListExtra<OldReaction>("reactions") ?: ArrayList()
         val usernameFilter = intent.getStringExtra("galleryFilter") ?: "none"
-        filteredPosts = ArrayList(posts.filter { it.username == usernameFilter })
+        filteredOldPosts = ArrayList(oldPosts.filter { it.username == usernameFilter })
 
         binding.recyclerViewPosts.layoutManager = GridLayoutManager(this, 3)
 
         if (usernameFilter == "none") {
-            binding.recyclerViewPosts.adapter = GalleryAdapter(posts, this)
+            binding.recyclerViewPosts.adapter = GalleryAdapter(oldPosts, this)
         } else {
-            if (filteredPosts.isNotEmpty()) {
-                binding.recyclerViewPosts.adapter = GalleryAdapter(filteredPosts, this)
+            if (filteredOldPosts.isNotEmpty()) {
+                binding.recyclerViewPosts.adapter = GalleryAdapter(filteredOldPosts, this)
             } else {
                 binding.noPostsGalleryTextView.visibility = View.VISIBLE
             }
@@ -43,16 +44,16 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
         }
         binding.galleryMessageBtn.setOnClickListener {
             val newIntent = Intent(this, ReactionActivity::class.java).apply {
-                putParcelableArrayListExtra("data", posts)
-                putParcelableArrayListExtra("reactions", reactions)
+                putParcelableArrayListExtra("data", oldPosts)
+                putParcelableArrayListExtra("reactions", oldReactions)
             }
             startActivity(newIntent)
         }
 
         binding.galleryReturnToHomeBtn.setOnClickListener {
             val resultIntent = Intent(applicationContext, HomeActivity::class.java).apply {
-                putParcelableArrayListExtra("updated_posts", posts)
-                putParcelableArrayListExtra("updated_reactions", reactions)
+                putParcelableArrayListExtra("updated_posts", oldPosts)
+                putParcelableArrayListExtra("updated_reactions", oldReactions)
                 putExtra("fromGallery", 1)
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
@@ -63,7 +64,7 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
 
         binding.galleryFriendsBtn.setOnClickListener {
             val intent = Intent(applicationContext, FriendsListActivity::class.java)
-            intent.putExtra("data", posts)
+            intent.putExtra("data", oldPosts)
             startActivity(intent)
         }
     }
