@@ -146,7 +146,7 @@ class PostActivity: AppCompatActivity() {
 
                         //adjust geoPoint with current location
                         val location = GeoPoint(0.0, 0.0)
-                        val post = Post(postUri.toString(), location, res.documents[0].reference, binding.captionEt.text.toString())
+                        val post = Post(postUri.toString(), location, uid, binding.captionEt.text.toString())
                         FirestoreReferences.addPost(post).await()
                     }
                 }
