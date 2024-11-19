@@ -59,7 +59,8 @@ class RegisterActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val userDoc = FirestoreReferences.getUserbyUsername(username).await()
-                    val user = User(username, email, password)
+                    val profileImg = FirestoreReferences.getDefaultUserPhoto().await().toString()
+                    val user = User(username, email, password, profileImg)
 
                     if(!userDoc.isEmpty) {
                         withContext(Dispatchers.Main){

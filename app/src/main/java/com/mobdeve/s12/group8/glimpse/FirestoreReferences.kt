@@ -1,11 +1,14 @@
 package com.mobdeve.s12.group8.glimpse
 
+import android.net.Uri
 import androidx.compose.runtime.snapshots.Snapshot
+import com.google.android.gms.auth.api.signin.internal.Storage
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.mobdeve.s12.group8.glimpse.model.User
 
@@ -28,6 +31,13 @@ class FirestoreReferences {
                 db = FirebaseFirestore.getInstance()
 
             return db as FirebaseFirestore
+        }
+
+        fun getStorageInstance(): StorageReference {
+            if(storage == null)
+                storage = FirebaseStorage.getInstance().reference
+
+            return storage as StorageReference
         }
 
         fun getUserCollectionReference() : CollectionReference{
@@ -58,6 +68,11 @@ class FirestoreReferences {
 
         fun getUserbyUsername(username: String): Task<QuerySnapshot> {
             return getUserCollectionReference().whereEqualTo(USERNAME_FIELD, username).get()
+        }
+
+        fun getDefaultUserPhoto(): Task<Uri> {
+            val path = "profile_imgs/default_pfp.jpg"
+            return getStorageInstance().child(path).downloadUrl
         }
     }
 }
