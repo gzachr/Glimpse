@@ -1,8 +1,15 @@
 package com.mobdeve.s12.group8.glimpse
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.graphics.Rect
+import android.media.ExifInterface
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MotionEvent
@@ -10,13 +17,19 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityPostBinding
+import java.io.InputStream
 
 class PostActivity: AppCompatActivity() {
     private lateinit var binding: ActivityPostBinding
+    private lateinit var auth: FirebaseAuth
+    private var croppedBitmap: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = FirebaseAuth.getInstance()
         binding = ActivityPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -27,6 +40,22 @@ class PostActivity: AppCompatActivity() {
             val layoutParams = binding.postIv.layoutParams
             layoutParams.height = width
             binding.postIv.layoutParams = layoutParams
+        }
+
+        //get captured photo from camera
+        val imageUri = intent.getStringExtra("CAPTURED_IMAGE_URI")
+        imageUri?.let {
+            val uri = Uri.parse(it)
+
+            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+            val rotatedBitmap = bitmap.rotate(90f)
+
+            croppedBitmap = rotatedBitmap.cropToSquare()
+
+            Glide.with(this)
+                .load(croppedBitmap)
+                .centerInside()
+                .into(binding.postIv)
         }
 
         binding.captionCounterTv.visibility = View.GONE
@@ -53,7 +82,7 @@ class PostActivity: AppCompatActivity() {
 
         binding.postBtn.setOnClickListener {
             /**
-             * TODO posting logic, save to DB
+             * TODO posting logic, save post to DB
              */
 
             finish()
@@ -79,5 +108,18 @@ class PostActivity: AppCompatActivity() {
             }
         }
         return super.dispatchTouchEvent(event)
+    }
+
+    // Extension function to rotate a Bitmap by a given number of degrees
+    private fun Bitmap.rotate(degrees: Float): Bitmap {
+        val matrix = Matrix().apply { postRotate(degrees) }
+        return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+    }
+
+    private fun Bitmap.cropToSquare(): Bitmap {
+        val dimension = minOf(width, height)
+        val xOffset = (width - dimension) / 2
+        val yOffset = (height - dimension) / 2
+        return Bitmap.createBitmap(this, xOffset, yOffset, dimension, dimension)
     }
 }

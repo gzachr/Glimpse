@@ -75,9 +75,6 @@ class RegisterActivity : AppCompatActivity() {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(this@RegisterActivity, "Successfully Registered", Toast.LENGTH_LONG).show()
                             val intent = Intent(this@RegisterActivity, HomeActivity::class.java)
-                            intent.apply {
-                                //insert info about user needed for rest of the app
-                            }
                             startActivity(intent)
                             finishAffinity()
                         }

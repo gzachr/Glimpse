@@ -54,10 +54,6 @@ class LoginActivity : AppCompatActivity() {
                         Toast.makeText(this@LoginActivity, "Succesfully Logged in", Toast.LENGTH_LONG).show()
                         val intent = Intent(this@LoginActivity, HomeActivity::class.java)
 
-                        intent.apply {
-                            // put extra as needed
-                        }
-
                         startActivity(intent)
                         finishAffinity()
                     }
