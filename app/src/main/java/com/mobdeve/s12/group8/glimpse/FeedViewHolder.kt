@@ -17,6 +17,7 @@ import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
 import OldPost
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
+
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -110,7 +111,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                                 .position(marker)
                                 .title("Marker")
                         )
-                        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker, 15f)
+                        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker, 16f)
                         googleMap.moveCamera(cameraUpdate)
                         googleMap.uiSettings.setAllGesturesEnabled(false)
                     }
