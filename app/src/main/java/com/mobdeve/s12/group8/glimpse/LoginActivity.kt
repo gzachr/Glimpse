@@ -46,7 +46,7 @@ class LoginActivity : AppCompatActivity() {
         else {
             CoroutineScope(Dispatchers.IO).launch {
                 try{
-                    val res = FirestoreReferences.getUserbyUsername(username).await()
+                    val res = FirestoreReferences.getUserByUsername(username).await()
                     val email = res.documents[0].toObject(User::class.java)?.email!!
                     auth.signInWithEmailAndPassword(email, password).await()
 

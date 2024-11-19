@@ -1,16 +1,20 @@
 package com.mobdeve.s12.group8.glimpse
 
 import android.net.Uri
-import androidx.compose.runtime.snapshots.Snapshot
-import com.google.android.gms.auth.api.signin.internal.Storage
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.mobdeve.s12.group8.glimpse.model.Post
 import com.mobdeve.s12.group8.glimpse.model.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class FirestoreReferences {
     companion object{
@@ -25,6 +29,7 @@ class FirestoreReferences {
         const val REACTIONS_COLLECTION = "reactions"
 
         const val USERNAME_FIELD = "username"
+        const val EMAIL_FIELD = "email"
 
         fun getFirestoreInstance() : FirebaseFirestore{
             if(db == null)
@@ -61,17 +66,31 @@ class FirestoreReferences {
             return reactionsRef as CollectionReference
         }
 
-
         fun addUser(user: User): Task<DocumentReference> {
             return getUserCollectionReference().add(user)
         }
 
-        fun getUserbyUsername(username: String): Task<QuerySnapshot> {
+        fun addPost(post: Post): Task<DocumentReference> {
+            return getPostCollectionReference().add(post)
+        }
+
+        fun getUserByUsername(username: String): Task<QuerySnapshot> {
             return getUserCollectionReference().whereEqualTo(USERNAME_FIELD, username).get()
+        }
+
+        fun getUserByEmail(email : String) : Task<QuerySnapshot> {
+            return getUserCollectionReference().whereEqualTo(EMAIL_FIELD, email).get()
         }
 
         fun getDefaultUserPhoto(): Task<Uri> {
             val path = "profile_imgs/default_pfp.jpg"
+            return getStorageInstance().child(path).downloadUrl
+        }
+
+        suspend fun saveImageToStorage(userId: String, data: ByteArray): Task<Uri> {
+            val path = "posts/${userId}/${System.currentTimeMillis()}.jpg"
+            getStorageInstance().child(path).putBytes(data).await()
+
             return getStorageInstance().child(path).downloadUrl
         }
     }

@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.mobdeve.s12.group8.glimpse.databinding.ActivityLoginBinding
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityRegisterBinding
 import com.mobdeve.s12.group8.glimpse.model.User
 import kotlinx.coroutines.CoroutineScope
@@ -58,7 +57,7 @@ class RegisterActivity : AppCompatActivity() {
         else {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val userDoc = FirestoreReferences.getUserbyUsername(username).await()
+                    val userDoc = FirestoreReferences.getUserByUsername(username).await()
                     val profileImg = FirestoreReferences.getDefaultUserPhoto().await().toString()
                     val user = User(username, email, password, profileImg)
 

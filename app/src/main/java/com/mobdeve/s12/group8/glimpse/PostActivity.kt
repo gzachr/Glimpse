@@ -1,17 +1,15 @@
 package com.mobdeve.s12.group8.glimpse
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.graphics.Rect
-import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -19,8 +17,15 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.QuerySnapshot
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityPostBinding
-import java.io.InputStream
+import com.mobdeve.s12.group8.glimpse.model.Post
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.io.ByteArrayOutputStream
 
 class PostActivity: AppCompatActivity() {
     private lateinit var binding: ActivityPostBinding
@@ -81,10 +86,7 @@ class PostActivity: AppCompatActivity() {
         })
 
         binding.postBtn.setOnClickListener {
-            /**
-             * TODO posting logic, save post to DB
-             */
-
+            savePost()
             finish()
         }
 
@@ -121,5 +123,38 @@ class PostActivity: AppCompatActivity() {
         val xOffset = (width - dimension) / 2
         val yOffset = (height - dimension) / 2
         return Bitmap.createBitmap(this, xOffset, yOffset, dimension, dimension)
+    }
+
+    private fun savePost() {
+        var postUri: Uri
+        var res: QuerySnapshot
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                if(auth.currentUser != null) {
+                    val email = auth.currentUser!!.email
+                    res = FirestoreReferences.getUserByEmail(email!!).await()
+                    val uid = res.documents[0].id
+
+
+                    croppedBitmap?.let { bitmap ->
+                        val bytes = ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+                        val data = bytes.toByteArray()
+
+                        postUri = FirestoreReferences.saveImageToStorage(uid, data).await()
+
+                        //adjust geoPoint with current location
+                        val location = GeoPoint(0.0, 0.0)
+                        val post = Post(postUri.toString(), location, res.documents[0].reference, binding.captionEt.text.toString())
+                        FirestoreReferences.addPost(post).await()
+                    }
+                }
+
+            } catch(e: Exception) {
+                Log.e("POST_ACTIVITY", "Error creating post")
+            }
+
+        }
     }
 }
