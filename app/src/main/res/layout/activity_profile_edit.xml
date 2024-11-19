@@ -102,6 +102,27 @@
                 app:layout_constraintTop_toBottomOf="@+id/currentProfileImage" />
 
             <EditText
+                android:id="@+id/editEmail"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/rounded_edit_text_background"
+                android:ems="10"
+                android:fontFamily="@font/poppins"
+                android:hint="Edit Email"
+                android:inputType="text"
+                android:paddingStart="15dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:textCursorDrawable="@drawable/cursor_color"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.504"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editUsername" />
+
+            <EditText
                 android:id="@+id/usernameEt"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
@@ -121,7 +142,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.504"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/editUsername" />
+                app:layout_constraintTop_toBottomOf="@+id/editEmail" />
 
             <Button
                 android:id="@+id/profileEditSaveButton"
