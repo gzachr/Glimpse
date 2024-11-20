@@ -36,17 +36,16 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
 
 
     @SuppressLint("ClickableViewAccessibility")
-    suspend fun bind(post: Post) {
+    suspend fun bind(post: Post, user: User) {
 
         auth = FirebaseAuth.getInstance()
-        val user = FirestoreReferences.getUserByID(post.userId).await().toObject(User::class.java)
-        if (auth.currentUser?.email != user?.email) {
+        if (auth.currentUser?.email != user.email) {
             binding.deleteBtn.visibility = View.GONE
         } else {
             binding.deleteBtn.visibility = View.VISIBLE
         }
 
-        user?.let {
+        user.let {
             val profileImageUrl = it.profileImage
             val imageUrl = profileImageUrl ?: FirestoreReferences.getDefaultUserPhoto().result.toString()
 
@@ -69,7 +68,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
             .apply(RequestOptions().transform(RoundedCorners(16)))
             .into(binding.feedPostIv)
 
-        binding.feedUsernameTv.text = user!!.username
+        binding.feedUsernameTv.text = user.username
         binding.feedCreatedAtTv.text = formatTimestampToRelative(post.createdAt)
         binding.feedCaptionTv.text = post.caption
 

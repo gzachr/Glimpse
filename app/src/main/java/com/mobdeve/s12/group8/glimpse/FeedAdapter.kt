@@ -9,9 +9,12 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.mobdeve.s12.group8.glimpse.model.OldReaction
 import com.mobdeve.s12.group8.glimpse.model.Post
+import com.mobdeve.s12.group8.glimpse.model.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class FeedAdapter(options: FirestoreRecyclerOptions<Post>):
     FirestoreRecyclerAdapter<Post, FeedViewHolder>(options) {
@@ -23,9 +26,12 @@ class FeedAdapter(options: FirestoreRecyclerOptions<Post>):
 
     override fun onBindViewHolder(holder: FeedViewHolder, position: Int, model: Post) {
         val documentId = snapshots.getSnapshot(position).id
-        CoroutineScope(Dispatchers.Main).launch {
-            holder.bind(model)
-            holder.setDeleteButtonListener(documentId)
+        CoroutineScope(Dispatchers.IO).launch {
+            val user = FirestoreReferences.getUserByID(model.userId).await().toObject(User::class.java)
+            withContext(Dispatchers.Main){
+                holder.bind(model, user!!)
+                holder.setDeleteButtonListener(documentId)
+            }
         }
     }
 }
