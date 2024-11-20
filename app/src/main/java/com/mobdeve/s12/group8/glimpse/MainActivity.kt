@@ -81,6 +81,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkLocationPermission(){
+
+    }
+
     private fun requestCameraPermission() {
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA),
             CAMERA_PERMISSION_REQUEST_CODE)
