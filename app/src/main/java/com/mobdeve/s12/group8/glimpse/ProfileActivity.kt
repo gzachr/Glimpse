@@ -25,10 +25,7 @@ class ProfileActivity : AppCompatActivity() {
             val intent = Intent(applicationContext, ProfileEditActivity::class.java)
             startActivity(intent)
         }
-        binding.profileEditLabel.setOnClickListener{
-            val intent = Intent(applicationContext, ProfileEditActivity::class.java)
-            startActivity(intent)
-        }
+
         Glide.with(this)
             .load(R.drawable.user1)
             .apply(RequestOptions().transform(RoundedCorners(1000)))
