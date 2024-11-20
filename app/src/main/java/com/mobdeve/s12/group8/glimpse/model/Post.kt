@@ -8,8 +8,8 @@ import java.util.Date
 data class Post(
     var imgUri: String,
     var location: GeoPoint, //subject to change datatype
-    var user: DocumentReference,
-    @ServerTimestamp val createdAt: Date?,
-    var caption: String
+    var userId: String,
+    var caption: String,
+    @ServerTimestamp val createdAt: Date? = null,
 ) {
 }

@@ -3,6 +3,7 @@ package com.mobdeve.s12.group8.glimpse
 import OldPost
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
@@ -11,11 +12,14 @@ import android.view.Surface
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityHomeBinding
 import com.mobdeve.s12.group8.glimpse.model.OldReaction
+import java.io.File
 
 class HomeActivity: AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
@@ -25,6 +29,7 @@ class HomeActivity: AppCompatActivity() {
     private var lensFacing: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var firstToast = false
     private val REQUEST_CODE_FEED = 1
+    private var imageCapture: ImageCapture? = null
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,11 +94,27 @@ class HomeActivity: AppCompatActivity() {
         }
 
         binding.captureBtn.setOnClickListener {
-            /**
-             * TODO logic for capturing photo
-             */
+            val photoFile = File(externalMediaDirs.firstOrNull(), "${System.currentTimeMillis()}.jpg")
+            val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-            startActivity(Intent(applicationContext, PostActivity::class.java))
+            imageCapture?.takePicture(
+                outputOptions,
+                ContextCompat.getMainExecutor(this),
+                object: ImageCapture.OnImageSavedCallback {
+                    override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                        val savedUri = Uri.fromFile(photoFile)
+                        val intent = Intent(applicationContext, PostActivity::class.java).apply {
+                            putExtra("CAPTURED_IMAGE_URI", savedUri.toString())
+                        }
+                        startActivity(intent)
+                    }
+
+                    override fun onError(exception: ImageCaptureException) {
+                        Toast.makeText(applicationContext, "Failed to capture image", Toast.LENGTH_SHORT).show()
+                        Log.e("HomeActivity", "Image capture failed", exception)
+                    }
+                }
+            )
         }
 
         startCamera()
@@ -108,6 +129,10 @@ class HomeActivity: AppCompatActivity() {
                 it.setSurfaceProvider(binding.previewView.surfaceProvider)
             }
 
+        imageCapture = ImageCapture.Builder()
+            .setTargetRotation(displayRotation)
+            .build()
+
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
@@ -117,7 +142,7 @@ class HomeActivity: AppCompatActivity() {
                 cameraProvider.unbindAll()
 
                 // Bind the camera lifecycle with the Preview use case
-                cameraProvider.bindToLifecycle(this, lensFacing, preview)
+                cameraProvider.bindToLifecycle(this, lensFacing, preview, imageCapture)
 
             } catch (exc: Exception) {
                 Log.e("CameraX", "Binding failed", exc)
