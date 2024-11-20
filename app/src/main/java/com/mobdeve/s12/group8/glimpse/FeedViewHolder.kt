@@ -23,6 +23,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.GeoPoint
 import com.mobdeve.s12.group8.glimpse.model.Post
 import com.mobdeve.s12.group8.glimpse.model.User
 import kotlinx.coroutines.tasks.await
@@ -77,7 +78,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
         val gestureDetector =
             GestureDetector(binding.root.context, object : GestureDetector.SimpleOnGestureListener() {
                 override fun onDoubleTap(e: MotionEvent): Boolean {
-                    toggleMap()
+                    toggleMap(post.location)
 
                     // Start the image change with animation
 //                    animateImageChange(binding.feedPostIv, newImage)
@@ -100,7 +101,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
 
     }
 
-    private fun toggleMap() {
+    private fun toggleMap(geoPoint: GeoPoint) {
         val fragmentManager = (binding.root.context as FragmentActivity).supportFragmentManager
 
         if (stateFlag) {
@@ -116,7 +117,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
             binding.feedPostIv.visibility = View.GONE
             binding.mapContainer.visibility = View.VISIBLE
             //TODO: adjust with actual post coordinates
-            val marker = LatLng(14.56494073682104, 120.99320813598213)
+            val marker = LatLng(geoPoint.latitude, geoPoint.longitude)
 
             // Only create a new SupportMapFragment if one doesn't exist
             if (mapFragment == null) {
