@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.os.Build
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -14,31 +15,46 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
-import OldPost
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.auth.FirebaseAuth
+import com.mobdeve.s12.group8.glimpse.model.Post
+import com.mobdeve.s12.group8.glimpse.model.User
+import kotlinx.coroutines.tasks.await
+import java.util.Date
+import java.util.concurrent.TimeUnit
 
 class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding.root) {
     private var stateFlag: Boolean = false
-    private val imageUri: Uri = Uri.parse("https://todocodigo.net/img/626.jpg")
     private var mapFragment: SupportMapFragment? = null
+    private lateinit var auth: FirebaseAuth
+
 
     @SuppressLint("ClickableViewAccessibility")
-    fun bind(oldPost: OldPost) {
-        if (oldPost.username != "user1") {
+    suspend fun bind(post: Post) {
+
+        auth = FirebaseAuth.getInstance()
+        val user = FirestoreReferences.getUserByID(post.userId).await().toObject(User::class.java)
+        if (auth.currentUser?.email != user?.email) {
             binding.deleteBtn.visibility = View.GONE
+        } else {
+            binding.deleteBtn.visibility = View.VISIBLE
         }
 
-        Glide.with(binding.feedUserIv.context)
-            .load(oldPost.userImageId)
-            .apply(RequestOptions().transform(RoundedCorners(50)))
-            .into(binding.feedUserIv)
+        user?.let {
+            val profileImageUrl = it.profileImage
+            val imageUrl = profileImageUrl ?: FirestoreReferences.getDefaultUserPhoto().result.toString()
+
+            Glide.with(binding.feedUserIv.context)
+                .load(imageUrl)
+                .apply(RequestOptions().transform(RoundedCorners(50)))
+                .into(binding.feedUserIv)
+        }
 
         // set height = to width so that image will show up as square
         binding.feedCv.post {
@@ -49,13 +65,13 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
         }
 
         Glide.with(binding.feedPostIv.context)
-            .load(oldPost.postImageId)
+            .load(post.imgUri)
             .apply(RequestOptions().transform(RoundedCorners(16)))
             .into(binding.feedPostIv)
 
-        binding.feedUsernameTv.text = oldPost.username
-        binding.feedCreatedAtTv.text = oldPost.createdAt
-        binding.feedCaptionTv.text = oldPost.caption
+        binding.feedUsernameTv.text = user!!.username
+        binding.feedCreatedAtTv.text = formatTimestampToRelative(post.createdAt)
+        binding.feedCaptionTv.text = post.caption
 
         //on double tap change to location view
         val gestureDetector =
@@ -129,27 +145,26 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
         stateFlag = !stateFlag
     }
 
-    private fun animateImageChange(imageView: ImageView, imageResId: Int) {
-        // Create a fade-out animation
-        val fadeOut = ObjectAnimator.ofFloat(imageView, "alpha", 1f, 0f).setDuration(300)
-        fadeOut.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                // Load the new image once fade out is done
-                Glide.with(imageView.context)
-                    .load(imageResId)
-                    .apply(RequestOptions().transform(RoundedCorners(16)))
-                    .into(imageView)
-
-                // Create a fade-in animation
-                val fadeIn = ObjectAnimator.ofFloat(imageView, "alpha", 0f, 1f).setDuration(300)
-                fadeIn.start() // Start the fade-in animation
-            }
-        })
-
-        fadeOut.start() // Start the fade-out animation
-    }
-
     fun setDeleteButtonListener(listener: View.OnClickListener) {
         binding.deleteBtn.setOnClickListener(listener) // Set the click listener for delete button
+    }
+
+    private fun formatTimestampToRelative(timestamp: Date?): String {
+        if (timestamp == null) return "Unknown"
+
+        val now = System.currentTimeMillis()
+        val createdAt = timestamp.time
+        val durationMillis = now - createdAt
+
+        val days = TimeUnit.MILLISECONDS.toDays(durationMillis)
+        val hours = TimeUnit.MILLISECONDS.toHours(durationMillis) % 24
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(durationMillis) % 60
+
+        return when {
+            days > 0 -> "${days}d ago"
+            hours > 0 -> "${hours}h ago"
+            minutes > 0 -> "${minutes}m ago"
+            else -> "Just now"
+        }
     }
 }
