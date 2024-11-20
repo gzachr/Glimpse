@@ -1,9 +1,12 @@
 package com.mobdeve.s12.group8.glimpse
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.Rect
+import android.location.Location
+import android.Manifest
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -15,7 +18,10 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.bumptech.glide.Glide
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.QuerySnapshot
@@ -31,11 +37,14 @@ class PostActivity: AppCompatActivity() {
     private lateinit var binding: ActivityPostBinding
     private lateinit var auth: FirebaseAuth
     private var croppedBitmap: Bitmap? = null
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = FirebaseAuth.getInstance()
         binding = ActivityPostBinding.inflate(layoutInflater)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
         setContentView(binding.root)
 
         binding.postRootLayout.requestFocus()
@@ -86,7 +95,7 @@ class PostActivity: AppCompatActivity() {
         })
 
         binding.postBtn.setOnClickListener {
-            savePost()
+            getCurrentLocationAndSavePost()
             finish()
         }
 
@@ -125,36 +134,58 @@ class PostActivity: AppCompatActivity() {
         return Bitmap.createBitmap(this, xOffset, yOffset, dimension, dimension)
     }
 
-    private fun savePost() {
-        var postUri: Uri
-        var res: QuerySnapshot
+    private fun getCurrentLocationAndSavePost() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Request location permission
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+            return
+        }
 
+        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+            location?.let {
+                val geoPoint = GeoPoint(it.latitude, it.longitude)
+                savePost(geoPoint)
+            } ?: run {
+                Log.e("POST_ACTIVITY", "Location is null.")
+                savePost(GeoPoint(0.0, 0.0))  // Fallback if location is unavailable
+            }
+        }
+    }
+
+    private fun savePost(location: GeoPoint) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                if(auth.currentUser != null) {
-                    val email = auth.currentUser!!.email
-                    res = FirestoreReferences.getUserByEmail(email!!).await()
+                auth.currentUser?.let { user ->
+                    val email = user.email
+                    val res = FirestoreReferences.getUserByEmail(email!!).await()
                     val uid = res.documents[0].id
-
 
                     croppedBitmap?.let { bitmap ->
                         val bytes = ByteArrayOutputStream()
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
                         val data = bytes.toByteArray()
 
-                        postUri = FirestoreReferences.saveImageToStorage(uid, data).await()
-
-                        //adjust geoPoint with current location
-                        val location = GeoPoint(0.0, 0.0)
+                        val postUri = FirestoreReferences.saveImageToStorage(uid, data).await()
                         val post = Post(postUri.toString(), location, uid, binding.captionEt.text.toString())
                         FirestoreReferences.addPost(post).await()
                     }
                 }
-
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 Log.e("POST_ACTIVITY", "Error creating post")
             }
-
         }
     }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            getCurrentLocationAndSavePost()
+        }
+    }
+
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
+    }
 }
+
