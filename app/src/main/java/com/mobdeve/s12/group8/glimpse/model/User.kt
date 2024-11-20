@@ -7,8 +7,7 @@ data class User(
     var email: String? = null,
     var password: String? = null,
     var profileImage: String? = null, // link to photo in Firebase Storage
-    var friendList: List<DocumentReference?> = emptyList(),  // List of references to friends
-    var posts: List<DocumentReference?> = emptyList(),
+    var friendList: List<String?> = emptyList(),  // List of  userId
     var reactionsReceived: List<DocumentReference> = emptyList()
 ) {
 }
