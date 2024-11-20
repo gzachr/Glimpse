@@ -22,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.firestore.GeoPoint
 
 class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding.root) {
     private var stateFlag: Boolean = false
@@ -111,7 +112,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                                 .position(marker)
                                 .title("Marker")
                         )
-                        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker, 16f)
+                        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker, 15.5f)
                         googleMap.moveCamera(cameraUpdate)
                         googleMap.uiSettings.setAllGesturesEnabled(false)
                     }
