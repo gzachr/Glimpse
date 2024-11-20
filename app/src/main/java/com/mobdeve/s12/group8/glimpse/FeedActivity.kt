@@ -74,9 +74,28 @@ class FeedActivity : AppCompatActivity() {
             }
         }
 
-        binding.heartBtn.setOnClickListener {
-            binding.heartBtn.setImageResource(if (isLiked) R.drawable.heart_icon_outline else R.drawable.heart_icon_filled)
-            isLiked = !isLiked
+        binding.locationBtn.setOnClickListener {
+            val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+            val snapView = helper.findSnapView(layoutManager) // Find the snapped view
+
+            if (snapView != null) {
+                val position = layoutManager.getPosition(snapView) // Get position of snapped view
+                val adapter = recyclerView.adapter as FeedAdapter
+                val currentPost = adapter.getItem(position) // Retrieve the post at this position
+                val location = currentPost.location
+
+                if (location.latitude != null && location.longitude != null) {
+                    val intent = Intent(this, LocationActivity::class.java)
+                    intent.putExtra("LATITUDE", location.latitude)
+                    intent.putExtra("LONGITUDE", location.longitude)
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(this, "Location not available for this post.", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this, "No post selected.", Toast.LENGTH_SHORT).show()
+            }
+
         }
 
         binding.feedViewAllBtn.setOnClickListener {
