@@ -167,4 +167,24 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
             else -> "Just now"
         }
     }
+
+    fun setDeleteButtonListener(documentId: String) {
+        binding.deleteBtn.setOnClickListener {
+            deletePost(documentId)
+        }
+    }
+
+    private fun deletePost(documentId: String) {
+        val postRef = FirestoreReferences.getPostCollectionReference().document(documentId)
+
+        postRef.delete()
+            .addOnSuccessListener {
+                // Notify the user of successful deletion (optional)
+                Log.d("FeedAdapter", "Post $documentId deleted successfully")
+            }
+            .addOnFailureListener { exception ->
+                // Handle the error
+                Log.e("FeedAdapter", "Error deleting post $documentId: ${exception.message}")
+            }
+    }
 }
