@@ -46,17 +46,13 @@ class LoginActivity : AppCompatActivity() {
         else {
             CoroutineScope(Dispatchers.IO).launch {
                 try{
-                    val res = FirestoreReferences.getUserbyUsername(username).await()
+                    val res = FirestoreReferences.getUserByUsername(username).await()
                     val email = res.documents[0].toObject(User::class.java)?.email!!
                     auth.signInWithEmailAndPassword(email, password).await()
 
                     withContext(Dispatchers.Main) {
                         Toast.makeText(this@LoginActivity, "Succesfully Logged in", Toast.LENGTH_LONG).show()
                         val intent = Intent(this@LoginActivity, HomeActivity::class.java)
-
-                        intent.apply {
-                            // put extra as needed
-                        }
 
                         startActivity(intent)
                         finishAffinity()
