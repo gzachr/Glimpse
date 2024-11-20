@@ -22,8 +22,10 @@ class FeedAdapter(options: FirestoreRecyclerOptions<Post>):
     }
 
     override fun onBindViewHolder(holder: FeedViewHolder, position: Int, model: Post) {
+        val documentId = snapshots.getSnapshot(position).id
         CoroutineScope(Dispatchers.Main).launch {
             holder.bind(model)
+            holder.setDeleteButtonListener(documentId)
         }
     }
 }
