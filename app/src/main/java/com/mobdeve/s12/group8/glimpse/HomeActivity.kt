@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.Surface
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
@@ -40,6 +41,17 @@ class HomeActivity: AppCompatActivity() {
         if (!firstToast) {
             Toast.makeText(this, "Double-tap to switch camera!", Toast.LENGTH_LONG).show()
             firstToast = true
+        }
+
+        val displayMetrics = resources.displayMetrics
+        val screenHeight = displayMetrics.heightPixels
+
+        val layoutParams1 = binding.captureBtnLL.layoutParams as ViewGroup.MarginLayoutParams
+        val layoutParams2 = binding.feedBtnLL.layoutParams as ViewGroup.MarginLayoutParams
+
+        if(screenHeight < 2160) {
+            layoutParams1.setMargins(0,20,0,0)
+            layoutParams2.setMargins(0, 20, 0, 0)
         }
 
         binding.viewFeedBtn.setOnClickListener {
