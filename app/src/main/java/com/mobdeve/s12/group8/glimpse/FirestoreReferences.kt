@@ -98,5 +98,9 @@ class FirestoreReferences {
 
             return getStorageInstance().child(path).downloadUrl
         }
+
+        fun updateUser(userId: String, updates: Map<String, Any>): Task<Void> {
+            return getUserCollectionReference().document(userId).update(updates)
+        }
     }
 }
