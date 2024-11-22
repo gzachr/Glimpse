@@ -10,6 +10,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityProfileEditBinding
+import com.mobdeve.s12.group8.glimpse.model.User
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -61,6 +62,7 @@ class ProfileEditActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
+
             }
 
             CoroutineScope(Dispatchers.IO).launch {
@@ -75,6 +77,16 @@ class ProfileEditActivity : AppCompatActivity() {
                             FirestoreReferences.updateUser(
                                 userId, mapOf(FirestoreReferences.USERNAME_FIELD to newUsername)
                             ).await()
+
+                            // Show Toast for successful username update
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(
+                                    this@ProfileEditActivity,
+                                    "Username updated successfully",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
                         }
 
                         // Update password in Firebase Auth directly
@@ -87,7 +99,7 @@ class ProfileEditActivity : AppCompatActivity() {
                                             "Password updated successfully",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        finish() // Close activity
+
                                     } else {
                                         Toast.makeText(
                                             this@ProfileEditActivity,
@@ -97,6 +109,7 @@ class ProfileEditActivity : AppCompatActivity() {
                                     }
                                 }
                         }
+                        finish()
                     }
                 } catch (e: Exception) {
                     Log.e("EditActivity", "Error updating details: $e")
