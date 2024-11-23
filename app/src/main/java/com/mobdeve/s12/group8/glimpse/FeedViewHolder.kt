@@ -48,12 +48,17 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
     fun bind(documentId: String, post: Post, user: User, currUserUID: String, reactions: ArrayList<Reaction>) {
         CoroutineScope(Dispatchers.Main).launch {
             // check if user is owner of post
-            if (currUserUID != post.userId ) {
+            if (currUserUID != post.userId) {
                 binding.deleteBtn.visibility = View.GONE
+                isLiked = false
+                binding.heartBtn.isEnabled = true
+                binding.heartBtn.setImageResource(R.drawable.heart_icon_outline)
+
                 for (reaction in reactions) {
                     if (reaction.postId == documentId) {
                         isLiked = true
                         binding.heartBtn.setImageResource(R.drawable.heart_icon_filled)
+                        break
                     }
                 }
             } else {
@@ -190,7 +195,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
         binding.heartBtn.setImageResource(if (isLiked) R.drawable.heart_icon_outline else R.drawable.heart_icon_filled)
         isLiked = !isLiked
 
-        if (isLiked) {
+        if (isLiked) { // liked a new post
             val reaction = Reaction(documentId, currUserUID)
             CoroutineScope(Dispatchers.Main).launch {
                 FirestoreReferences.addReaction(reaction).await()
@@ -203,15 +208,6 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
 
                 val reactionId = reactionsQuery.documents[0].id
 
-                val currentUser = FirestoreReferences.getUserByID(currUserUID).await()
-                currentUser.reference.update("postsLiked", FieldValue.arrayUnion(reactionId))
-                    .addOnSuccessListener {
-                        Log.d("FeedAdapter", "Reaction added to current user's postsLiked successfully")
-                    }
-                    .addOnFailureListener { exception ->
-                        Log.e("FeedAdapter", "Error updating postsLiked: ${exception.message}")
-                    }
-
                 val userDocRef = FirestoreReferences.getUserByID(userId).await()
                 userDocRef.reference.update("reactionsReceived", FieldValue.arrayUnion(reactionId))
                     .addOnSuccessListener {
@@ -222,7 +218,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                     }
             }
         }
-        else {
+        else { // unliked a post
             FirestoreReferences.getReactionCollectionReference()
                 .whereEqualTo("postId", documentId)
                 .whereEqualTo("reactorId", currUserUID)
@@ -237,31 +233,6 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                                 Log.d("FeedAdapter", "Reaction deleted successfully")
 
                                 val reactionId = doc.id // Get the reaction ID
-
-                                FirestoreReferences.getUserByID(currUserUID)
-                                    .addOnSuccessListener { currentUser ->
-                                        currentUser.reference.update(
-                                            "postsLiked", FieldValue.arrayRemove(reactionId)
-                                        )
-                                            .addOnSuccessListener {
-                                                Log.d(
-                                                    "FeedAdapter",
-                                                    "Successfully removed reactionId from postsLiked"
-                                                )
-                                            }
-                                            .addOnFailureListener { exception ->
-                                                Log.e(
-                                                    "FeedAdapter",
-                                                    "Error removing reactionId from postsLiked: ${exception.message}"
-                                                )
-                                            }
-                                    }
-                                    .addOnFailureListener { exception ->
-                                        Log.e(
-                                            "FeedAdapter",
-                                            "Error fetching user document: ${exception.message}"
-                                        )
-                                    }
 
                                 FirestoreReferences.getUserByID(userId)
                                     .addOnSuccessListener { userDocSnapshot ->

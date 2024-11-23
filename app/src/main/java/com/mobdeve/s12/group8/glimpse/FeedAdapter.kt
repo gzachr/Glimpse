@@ -18,11 +18,31 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class FeedAdapter(
-    options: FirestoreRecyclerOptions<Post>
-) : FirestoreRecyclerAdapter<Post, FeedViewHolder>(options) {
+class FeedAdapter(options: FirestoreRecyclerOptions<Post>): FirestoreRecyclerAdapter<Post, FeedViewHolder>(options) {
     private lateinit var auth: FirebaseAuth
     private var currUserUID: String? = null
+    private val reactionsList = ArrayList<Reaction>()
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            auth = FirebaseAuth.getInstance()
+            auth.currentUser?.let { firebaseUser ->
+                val userDocument = FirestoreReferences.getUserByEmail(firebaseUser.email!!)
+                    .await()
+                    .documents
+                    .firstOrNull()
+                currUserUID = userDocument?.id
+            }
+
+            val reactionsQuery = FirestoreReferences.getReactionCollectionReference()
+                .whereEqualTo("reactorId", currUserUID)
+            val reactionsSnapshot = reactionsQuery.get().await()
+            reactionsSnapshot.documents.forEach { document ->
+                val reaction = document.toObject(Reaction::class.java)
+                reactionsList.add(reaction!!)
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
         val feedBinding = FeedLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -33,26 +53,6 @@ class FeedAdapter(
         val documentId = snapshots.getSnapshot(position).id
         CoroutineScope(Dispatchers.IO).launch {
             val user = FirestoreReferences.getUserByID(model.userId).await().toObject(User::class.java)
-
-            // get current user details to get UID
-            auth = FirebaseAuth.getInstance()
-            auth.currentUser?.let { firebaseUser ->
-                val userDocument = FirestoreReferences.getUserByEmail(firebaseUser.email!!)
-                    .await()
-                    .documents
-                    .firstOrNull()
-                currUserUID = userDocument?.id
-            }
-
-            // get reactions list of current user
-            val reactionsList = ArrayList<Reaction>()
-            val reactionsQuery = FirestoreReferences.getReactionCollectionReference()
-                .whereEqualTo("reactorId", currUserUID)
-            val reactionsSnapshot = reactionsQuery.get().await()
-            reactionsSnapshot.documents.forEach { document ->
-                val reaction = document.toObject(Reaction::class.java)
-                reactionsList.add(reaction!!)
-            }
 
             withContext(Dispatchers.Main){
                 holder.bind(documentId, model, user!!, currUserUID!!, reactionsList)
