@@ -46,19 +46,17 @@ class ProfileActivity : AppCompatActivity() {
                         val username = userDocument.getString(FirestoreReferences.USERNAME_FIELD)
                         val profileImageUrl = userDocument.getString(FirestoreReferences.PROFILE_IMAGE_URL_FIELD)
 
-                        // Update UI
+                        //show info from db
                         binding.profileName.text = username
                         binding.profileEmail.text = email
 
-                        // Check for custom profile image
                         if (!profileImageUrl.isNullOrEmpty()) {
-                            // Load custom profile image
                             Glide.with(this@ProfileActivity)
                                 .load(profileImageUrl)
                                 .apply(RequestOptions().transform(RoundedCorners(1000)))
                                 .into(binding.profileImage)
                         } else {
-                            // Load default profile image
+                            //default pfp load
                             FirestoreReferences.getDefaultUserPhoto()
                                 .addOnSuccessListener { uri ->
                                     Glide.with(this@ProfileActivity)
@@ -94,6 +92,57 @@ class ProfileActivity : AppCompatActivity() {
             FirebaseAuth.getInstance().signOut()
             startActivity(Intent(this@ProfileActivity, MainActivity::class.java))
             finishAffinity()
+        }
+    }
+    //automatic changes from editProfile
+    override fun onResume() {
+        super.onResume()
+
+        val email = auth.currentUser?.email
+
+        if (email != null) {
+            binding.profileDetailsCl.visibility = View.INVISIBLE
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val userSnapshot = FirestoreReferences.getUserByEmail(email).await()
+
+                    if (!userSnapshot.isEmpty) {
+                        val userDocument = userSnapshot.documents[0]
+                        val username = userDocument.getString(FirestoreReferences.USERNAME_FIELD)
+                        val profileImageUrl = userDocument.getString(FirestoreReferences.PROFILE_IMAGE_URL_FIELD)
+
+
+                        binding.profileName.text = username
+                        binding.profileEmail.text = email
+
+                        if (!profileImageUrl.isNullOrEmpty()) {
+                            Glide.with(this@ProfileActivity)
+                                .load(profileImageUrl)
+                                .apply(RequestOptions().transform(RoundedCorners(1000)))
+                                .into(binding.profileImage)
+                        } else {
+                            FirestoreReferences.getDefaultUserPhoto()
+                                .addOnSuccessListener { uri ->
+                                    Glide.with(this@ProfileActivity)
+                                        .load(uri)
+                                        .apply(RequestOptions().transform(RoundedCorners(1000)))
+                                        .into(binding.profileImage)
+                                }
+                                .addOnFailureListener { exception ->
+                                    Log.e("ProfileActivity", "Failed to load default user photo: $exception")
+                                }
+                        }
+                    } else {
+                        Log.e("ProfileActivity", "User not found with email: $email")
+                    }
+                } catch (e: Exception) {
+                    Log.e("ProfileActivity", "Error refreshing user data: $e")
+                } finally {
+                    binding.profileDetailsCl.visibility = View.VISIBLE
+                }
+            }
+        } else {
+            Log.e("ProfileActivity", "No logged-in user found.")
         }
     }
 }
