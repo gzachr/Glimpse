@@ -26,6 +26,7 @@ class FeedActivity : AppCompatActivity() {
     private lateinit var currUser: User
     private lateinit var currUserUID: String
     private lateinit var userIDFilter: String
+    private var postID: String? = null
     private lateinit var postsQuery: Query
     private lateinit var binding: ActivityFeedBinding
     private lateinit var recyclerView: RecyclerView
@@ -46,6 +47,7 @@ class FeedActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userIDFilter = intent.getStringExtra(IntentKeys.USER_ID_FILTER.toString()) ?: "Everyone"
+        postID = intent.getStringExtra(IntentKeys.POST_ID.toString())
 
         binding = ActivityFeedBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -167,6 +169,13 @@ class FeedActivity : AppCompatActivity() {
                     adapter = FeedAdapter(options)
                     recyclerView.adapter = adapter
                     adapter.startListening()
+
+                    adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                            super.onItemRangeInserted(positionStart, itemCount)
+                            postID?.let { scrollToPost(it) }
+                        }
+                    })
                 }
             }
             .addOnFailureListener { exception ->

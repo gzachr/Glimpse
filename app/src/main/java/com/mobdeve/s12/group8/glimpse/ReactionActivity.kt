@@ -1,46 +1,98 @@
 package com.mobdeve.s12.group8.glimpse
 
-import OldPost
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityReactionsBinding
-import com.mobdeve.s12.group8.glimpse.model.OldReaction
+import com.mobdeve.s12.group8.glimpse.model.Post
+import com.mobdeve.s12.group8.glimpse.model.Reaction
+import com.mobdeve.s12.group8.glimpse.model.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ReactionActivity: AppCompatActivity(), ReactionAdapter.OnNotificationsClickListener {
-    private var oldPosts: ArrayList<OldPost> = ArrayList()
-    private var oldReactions: ArrayList<OldReaction> = ArrayList()
     private lateinit var binding: ActivityReactionsBinding
+    private lateinit var auth: FirebaseAuth
+    private lateinit var currUser: User
+    private lateinit var currUserUID: String
+    private lateinit var reactions: List<Reaction>
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: ReactionAdapter
+
+    data class PostWithId(
+        val postId: String,
+        val post: Post
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        oldPosts = intent.getParcelableArrayListExtra<OldPost>("data") ?: ArrayList()
-        oldReactions = intent.getParcelableArrayListExtra<OldReaction>("reactions") ?: ArrayList()
-
         binding = ActivityReactionsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        recyclerView = binding.reactionRecyclerView
 
+        auth = FirebaseAuth.getInstance()
+        CoroutineScope(Dispatchers.Main).launch {
+            auth.currentUser?.let { firebaseUser ->
+                val query = FirestoreReferences.getUserByEmail(firebaseUser.email!!)
+                query.addOnSuccessListener { querySnapshot ->
+                    val userDocument = querySnapshot.documents.firstOrNull()
+                    userDocument?.let {
+                        currUser = it.toObject(User::class.java)!!
+                        currUserUID = it.id
+                        fetchReactions()
+                    }
+                }
+            }
+        }
 
-        binding.reactionRecyclerView.layoutManager = LinearLayoutManager(this)
-        binding.reactionRecyclerView.adapter = ReactionAdapter(oldReactions, this)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         binding.reactionExitButton.setOnClickListener {
             finish()
         }
     }
 
-    override fun onNotificationsClick(position: Int) {
-        val homeIntent = Intent(this, HomeActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putParcelableArrayListExtra("updated_posts", oldPosts)
-            putParcelableArrayListExtra("updated_reactions", oldReactions)
-            putExtra("open_feed_at_position", position)
-            putExtra("usernameFilter", "none")
+    override fun onNotificationsClick(postID: String) {
+        val postIntent = Intent(this, FeedActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(IntentKeys.POST_ID.toString(), postID)
         }
-        startActivity(homeIntent)
+        setResult(RESULT_OK, postIntent)
+        startActivity(postIntent)
         finish()
     }
 
+    private fun fetchReactions() {
+        FirestoreReferences.getPostCollectionReference()
+            .whereEqualTo("userId", currUserUID)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val postsWithIds = querySnapshot.documents.mapNotNull { document ->
+                    val post = document.toObject(Post::class.java)
+                    if (post != null) PostWithId(document.id, post) else null
+                }
+
+                val postIDs = postsWithIds.map { it.postId }
+
+                FirestoreReferences.getReactionCollectionReference()
+                    .whereIn("postId", postIDs)
+                    .get()
+                    .addOnSuccessListener { reactionSnapshot ->
+                        reactions = reactionSnapshot.toObjects(Reaction::class.java)
+
+                        val postReactionsMap = reactions.associate { reaction ->
+                            reaction.postId to postsWithIds.firstOrNull { it.postId == reaction.postId }?.post?.imgUri
+                        }
+
+                        adapter = ReactionAdapter(reactions, postReactionsMap, this)
+                        recyclerView.adapter = adapter
+                    }
+            }
+    }
 
 }
