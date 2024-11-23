@@ -11,12 +11,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Query
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityFeedBinding
 import com.mobdeve.s12.group8.glimpse.model.Post
+import com.mobdeve.s12.group8.glimpse.model.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class FeedActivity : AppCompatActivity() {
-    private lateinit var usernameFilter: String
+    private lateinit var auth: FirebaseAuth
+    private lateinit var currUser: User
+    private lateinit var currUserUID: String
+    private lateinit var userIDFilter: String
     private lateinit var postsQuery: Query
     private lateinit var binding: ActivityFeedBinding
     private lateinit var recyclerView: RecyclerView
@@ -36,39 +44,26 @@ class FeedActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        usernameFilter = intent.getStringExtra(IntentKeys.USERNAME_FILTER.toString()) ?: "none"
+        userIDFilter = intent.getStringExtra(IntentKeys.USER_ID_FILTER.toString()) ?: "Everyone"
 
         binding = ActivityFeedBinding.inflate(layoutInflater)
         setContentView(binding.root)
         recyclerView = binding.feedRv
 
-        if (usernameFilter != "none") {
-            postsQuery= FirestoreReferences.getPostCollectionReference()
-                .whereEqualTo("userId", usernameFilter)
-                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-        } else {
-            postsQuery= FirestoreReferences.getPostCollectionReference()
-                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-        }
-
-        val options = FirestoreRecyclerOptions.Builder<Post>()
-            .setQuery(postsQuery, Post::class.java)
-            .build()
-
-        postsQuery.get()
-            .addOnSuccessListener { querySnapshot ->
-                if (querySnapshot.isEmpty) {
-                    binding.noPostsTextView.visibility = View.VISIBLE
-                } else {
-                    binding.noPostsTextView.visibility = View.GONE
-                    adapter = FeedAdapter(options)
-                    recyclerView.adapter = adapter
-                    adapter.startListening()
+        auth = FirebaseAuth.getInstance()
+        CoroutineScope(Dispatchers.Main).launch {
+            auth.currentUser?.let { firebaseUser ->
+                val query = FirestoreReferences.getUserByEmail(firebaseUser.email!!)
+                query.addOnSuccessListener { querySnapshot ->
+                    val userDocument = querySnapshot.documents.firstOrNull()
+                    userDocument?.let {
+                        currUser = it.toObject(User::class.java)!!
+                        currUserUID = it.id
+                        fetchPosts()
+                    }
                 }
             }
-            .addOnFailureListener { exception ->
-                Log.e("FirestoreQuery", "Error retrieving posts: ${exception.message}")
-            }
+        }
 
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         helper.attachToRecyclerView(recyclerView)
@@ -110,7 +105,7 @@ class FeedActivity : AppCompatActivity() {
 
         binding.feedGalleryBtn.setOnClickListener {
             val intent = Intent(this, GalleryActivity::class.java).apply {
-                putExtra(IntentKeys.USERNAME_FILTER.toString(), usernameFilter)
+                putExtra(IntentKeys.USER_ID_FILTER.toString(), userIDFilter)
             }
             newIntentActivity.launch(intent)
         }
@@ -135,6 +130,45 @@ class FeedActivity : AppCompatActivity() {
         }
     }
 
+    private fun fetchPosts() {
+        currUser.friendList += currUserUID
+        if (userIDFilter != "Everyone") {
+            postsQuery = FirestoreReferences.getPostCollectionReference()
+                .whereEqualTo("userId", userIDFilter)
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+        } else {
+            if (currUser.friendList.isNotEmpty()) {
+                postsQuery = FirestoreReferences.getPostCollectionReference()
+                    .whereIn("userId", currUser.friendList)
+                    .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            } else {
+                postsQuery = FirestoreReferences.getPostCollectionReference()
+                    .whereEqualTo("nonExistentField", "nonExistentValue")
+            }
+        }
+
+        postsQuery.get()
+            .addOnSuccessListener { querySnapshot ->
+                if (querySnapshot.isEmpty) {
+                    binding.noPostsTextView.visibility = View.VISIBLE
+                    binding.noPostsTextView.text = "No posts yet."
+
+                } else {
+                    val options = FirestoreRecyclerOptions.Builder<Post>()
+                        .setQuery(postsQuery, Post::class.java)
+                        .build()
+
+                    binding.noPostsTextView.visibility = View.GONE
+                    adapter = FeedAdapter(options)
+                    recyclerView.adapter = adapter
+                    adapter.startListening()
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FirestoreQuery", "Error retrieving posts: ${exception.message}")
+            }
+    }
+
     private fun scrollToPost(postID: String) {
         for (position in 0 until adapter.itemCount) {
             val snapshot = adapter.snapshots.getSnapshot(position)
@@ -143,10 +177,5 @@ class FeedActivity : AppCompatActivity() {
                 break
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        adapter.stopListening()
     }
 }
