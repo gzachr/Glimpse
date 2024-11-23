@@ -19,6 +19,7 @@ import com.mobdeve.s12.group8.glimpse.model.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class FeedActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -150,9 +151,13 @@ class FeedActivity : AppCompatActivity() {
         postsQuery.get()
             .addOnSuccessListener { querySnapshot ->
                 if (querySnapshot.isEmpty) {
-                    binding.noPostsTextView.visibility = View.VISIBLE
-                    binding.noPostsTextView.text = "No posts yet."
-
+                    CoroutineScope(Dispatchers.Main).launch {
+                        if (userIDFilter == "Everyone"){
+                            getUsername("KIAeAe6VPsLWJiYWfq8Y")
+                        } else {
+                            getUsername(userIDFilter)
+                        }
+                    }
                 } else {
                     val options = FirestoreRecyclerOptions.Builder<Post>()
                         .setQuery(postsQuery, Post::class.java)
@@ -167,6 +172,13 @@ class FeedActivity : AppCompatActivity() {
             .addOnFailureListener { exception ->
                 Log.e("FirestoreQuery", "Error retrieving posts: ${exception.message}")
             }
+    }
+
+    private suspend fun getUsername(filterUserID: String) {
+        val documentSnapshot = FirestoreReferences.getUserByID(filterUserID).await()
+        val username = documentSnapshot.toObject(User::class.java)?.username
+        binding.noPostsTextView.visibility = View.VISIBLE
+        binding.noPostsTextView.text = "No posts yet from $username"
     }
 
     private fun scrollToPost(postID: String) {

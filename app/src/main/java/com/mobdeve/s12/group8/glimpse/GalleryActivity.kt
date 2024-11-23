@@ -11,11 +11,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.toObject
 import com.mobdeve.s12.group8.glimpse.model.Post
 import com.mobdeve.s12.group8.glimpse.model.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener {
     private lateinit var auth: FirebaseAuth
@@ -98,8 +100,13 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
         postsQuery.get()
             .addOnSuccessListener { querySnapshot ->
                 if (querySnapshot.isEmpty) {
-                    binding.noPostsGalleryTextView.visibility = View.VISIBLE
-                    binding.noPostsGalleryTextView.text = "No posts yet."
+                    CoroutineScope(Dispatchers.Main).launch {
+                        if (userIDFilter == "Everyone"){
+                            getUsername("KIAeAe6VPsLWJiYWfq8Y")
+                        } else {
+                            getUsername(userIDFilter)
+                        }
+                    }
                 } else {
                     val options = FirestoreRecyclerOptions.Builder<Post>()
                         .setQuery(postsQuery, Post::class.java)
@@ -114,6 +121,13 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
             .addOnFailureListener { exception ->
                 Log.e("FirestoreQuery", "Error retrieving posts: ${exception.message}")
             }
+    }
+
+    private suspend fun getUsername(filterUserID: String) {
+        val documentSnapshot = FirestoreReferences.getUserByID(filterUserID).await()
+        val username = documentSnapshot.toObject(User::class.java)?.username
+        binding.noPostsGalleryTextView.visibility = View.VISIBLE
+        binding.noPostsGalleryTextView.text = "No posts yet from $username"
     }
 
     override fun onPostClick(postID: String) {
