@@ -23,6 +23,7 @@ import kotlinx.coroutines.withContext
 class ProfileEditActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileEditBinding
     private lateinit var auth: FirebaseAuth
+    private var isImageSelected: Boolean = false
     companion object {
         private const val REQUEST_IMAGE_PICK = 1001
     }
@@ -105,6 +106,7 @@ class ProfileEditActivity : AppCompatActivity() {
 
                             withContext(Dispatchers.Main) {
                                 Toast.makeText(this@ProfileEditActivity, "Profile updated successfully.", Toast.LENGTH_SHORT).show()
+                                isImageSelected = false
                                 finish()
                             }
                         }
@@ -125,7 +127,7 @@ class ProfileEditActivity : AppCompatActivity() {
         }
         Glide.with(this)
             .load(R.drawable.user1)
-            .apply(RequestOptions().transform(RoundedCorners(1000)))
+            .apply(RequestOptions().transform(CircleCrop()))
             .into(binding.currentProfileImage)
 
         Glide.with(this)
@@ -154,6 +156,7 @@ class ProfileEditActivity : AppCompatActivity() {
 
     private fun updateProfileImagePreview(imageUri: Uri) {
         // Update the profile image preview
+        isImageSelected = true
         Glide.with(this)
             .load(imageUri)
             .apply(RequestOptions().transform(CircleCrop()))
@@ -168,6 +171,7 @@ class ProfileEditActivity : AppCompatActivity() {
             binding.currentProfileImage.setImageURI(uri) // Display the selected image
             uri?.let {
                 selectedImageUri = it
+                isImageSelected = true
             }
         }
         Glide.with(this)
@@ -175,5 +179,43 @@ class ProfileEditActivity : AppCompatActivity() {
             .apply(RequestOptions().transform(CircleCrop()))
             .into(binding.currentProfileImage)
 
+    }
+    override fun onResume() {
+        super.onResume()
+
+        // Only refresh data if no tentative image is selected
+        if (!isImageSelected) {
+            val currentUser = auth.currentUser
+            if (currentUser != null) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    try {
+                        val email = currentUser.email
+                        if (!email.isNullOrEmpty()) {
+                            val userSnapshot = FirestoreReferences.getUserByEmail(email).await()
+                            if (!userSnapshot.isEmpty) {
+                                val userDoc = userSnapshot.documents[0]
+                                val currentUsername = userDoc.getString(FirestoreReferences.USERNAME_FIELD)
+                                val currentProfileImageUrl = userDoc.getString(FirestoreReferences.PROFILE_IMAGE_URL_FIELD)
+
+                                // Update username in EditText
+                                binding.editUsername.setText(currentUsername)
+
+                                // Load profile image (custom or default)
+                                Glide.with(this@ProfileEditActivity)
+                                    .load(currentProfileImageUrl ?: R.drawable.user1)
+                                    .apply(RequestOptions().transform(CircleCrop()))
+                                    .into(binding.currentProfileImage)
+                            } else {
+                                Log.e("ProfileEditActivity", "User data not found for email: $email")
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e("ProfileEditActivity", "Error refreshing user data: $e")
+                    }
+                }
+            } else {
+                Log.e("ProfileEditActivity", "No logged-in user.")
+            }
+        }
     }
 }
