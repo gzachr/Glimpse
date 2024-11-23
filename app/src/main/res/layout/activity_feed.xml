@@ -124,11 +124,11 @@
                     android:background="@drawable/circle_button_pink_outline_white_fill"/>
 
                 <ImageButton
-                    android:id="@+id/heartBtn"
+                    android:id="@+id/locationBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="#00FFFFFF"
-                    android:src="@drawable/heart_icon_outline" />
+                    android:src="@drawable/location_icon" />
 
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,6 +11,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.mobdeve.s12.group8.glimpse.model.Post
+import com.mobdeve.s12.group8.glimpse.model.Reaction
 import com.mobdeve.s12.group8.glimpse.model.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -73,6 +74,10 @@ class FirestoreReferences {
 
         fun addPost(post: Post): Task<DocumentReference> {
             return getPostCollectionReference().add(post)
+        }
+
+        fun addReaction(reaction: Reaction): Task<DocumentReference> {
+            return getReactionCollectionReference().add(reaction)
         }
 
         fun getUserByUsername(username: String): Task<QuerySnapshot> {

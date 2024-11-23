@@ -5,9 +5,9 @@ import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
 data class Reaction (
-    var reactor: DocumentReference,
-    var post: DocumentReference,
-    @ServerTimestamp val date: Date
+    var postId: String = "",
+    var reactorId: String= "",
+    @ServerTimestamp val timeReacted: Date? = null
 ) {
 
 }
