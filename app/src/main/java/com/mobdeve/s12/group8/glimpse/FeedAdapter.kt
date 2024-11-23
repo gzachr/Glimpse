@@ -2,10 +2,7 @@ package com.mobdeve.s12.group8.glimpse
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
-import OldPost
-import android.util.Log
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -16,15 +13,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 class FeedAdapter(options: FirestoreRecyclerOptions<Post>): FirestoreRecyclerAdapter<Post, FeedViewHolder>(options) {
     private lateinit var auth: FirebaseAuth
     private var currUserUID: String? = null
-    private val reactionsList = ArrayList<Reaction>()
 
     init {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
             auth = FirebaseAuth.getInstance()
             auth.currentUser?.let { firebaseUser ->
                 val userDocument = FirestoreReferences.getUserByEmail(firebaseUser.email!!)
@@ -32,14 +27,6 @@ class FeedAdapter(options: FirestoreRecyclerOptions<Post>): FirestoreRecyclerAda
                     .documents
                     .firstOrNull()
                 currUserUID = userDocument?.id
-            }
-
-            val reactionsQuery = FirestoreReferences.getReactionCollectionReference()
-                .whereEqualTo("reactorId", currUserUID)
-            val reactionsSnapshot = reactionsQuery.get().await()
-            reactionsSnapshot.documents.forEach { document ->
-                val reaction = document.toObject(Reaction::class.java)
-                reactionsList.add(reaction!!)
             }
         }
     }
@@ -51,14 +38,21 @@ class FeedAdapter(options: FirestoreRecyclerOptions<Post>): FirestoreRecyclerAda
 
     override fun onBindViewHolder(holder: FeedViewHolder, position: Int, model: Post) {
         val documentId = snapshots.getSnapshot(position).id
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
             val user = FirestoreReferences.getUserByID(model.userId).await().toObject(User::class.java)
+            val currUserReactedPostsID: MutableList<String> = mutableListOf()
 
-            withContext(Dispatchers.Main){
-                holder.bind(documentId, model, user!!, currUserUID!!, reactionsList)
-                holder.setDeleteButtonListener(documentId)
-                holder.setReactButtonListener(documentId, currUserUID!!, model.userId)
+            val reactionsQuery = FirestoreReferences.getReactionCollectionReference()
+                .whereEqualTo("reactorId", currUserUID)
+            val reactionsSnapshot = reactionsQuery.get().await()
+            reactionsSnapshot.documents.forEach { document ->
+                val reaction = document.toObject(Reaction::class.java)
+                currUserReactedPostsID.add(reaction!!.postId)
             }
+
+            holder.bind(documentId, model, user!!, currUserUID!!, currUserReactedPostsID)
+            holder.setDeleteButtonListener(documentId)
+            holder.setReactButtonListener(documentId, currUserUID!!, model.userId)
         }
     }
 }
