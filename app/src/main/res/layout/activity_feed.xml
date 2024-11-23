@@ -53,7 +53,7 @@
                 android:textSize="17sp" />
 
             <ImageButton
-                android:id="@+id/feedMessageBtn"
+                android:id="@+id/feedNotificationsBtn"
                 android:layout_width="1dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="30dp"
@@ -109,7 +109,7 @@
                 tools:layout_editor_absoluteX="-16dp">
 
                 <ImageButton
-                    android:id="@+id/feedViewAllBtn"
+                    android:id="@+id/feedGalleryBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="#00000000"

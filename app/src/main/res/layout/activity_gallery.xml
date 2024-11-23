@@ -24,7 +24,7 @@
             android:paddingEnd="5dp">
 
             <ImageButton
-                android:id="@+id/reactionExitButton"
+                android:id="@+id/galleryProfileButton"
                 android:layout_width="1dp"
                 android:layout_height="50dp"
                 android:layout_marginEnd="30dp"
@@ -54,7 +54,7 @@
                 android:textSize="18sp" />
 
             <ImageButton
-                android:id="@+id/galleryMessageBtn"
+                android:id="@+id/galleryNotificationsBtn"
                 android:layout_width="1dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="30dp"
