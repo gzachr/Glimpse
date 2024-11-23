@@ -20,21 +20,32 @@ class ReactionViewHolder(private val binding: ItemReactionBinding): ViewHolder(b
 
         Glide.with(binding.postImage.context)
             .load(imgUri)
-            .apply(RequestOptions().transform(RoundedCorners(16)))
+            .apply(RequestOptions().transform(RoundedCorners(8)))
             .into(binding.postImage)
 
         CoroutineScope(Dispatchers.Main).launch {
-            bindUsername(reaction.reactorId)
+            bindUser(reaction.reactorId)
         }
 
         val timeReacted = formatTimestampToRelative(reaction.timeReacted)
         binding.reactionDate.text = timeReacted
     }
 
-    private suspend fun bindUsername(reactorId: String) {
+    private suspend fun bindUser(reactorId: String) {
         val documentSnapshot = FirestoreReferences.getUserByID(reactorId).await()
-        val username = documentSnapshot.toObject(User::class.java)?.username
+        val userProfile = documentSnapshot.toObject(User::class.java)?.profileImage
+        var username = documentSnapshot.toObject(User::class.java)?.username
+
+        if (username?.length!! > 9) {
+            username = username.substring(0, 6) + "..."
+        }
+
         binding.reactionString.text = "$username has liked your post."
+
+        Glide.with(binding.userImage.context)
+            .load(userProfile)
+            .apply(RequestOptions().transform(RoundedCorners(50)))
+            .into(binding.userImage)
     }
 
     private fun formatTimestampToRelative(timestamp: Date?): String {
