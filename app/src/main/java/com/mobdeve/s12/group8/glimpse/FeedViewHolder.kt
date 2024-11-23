@@ -1,34 +1,22 @@
 package com.mobdeve.s12.group8.glimpse
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.net.Uri
-import android.os.Build
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
 import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.compose.ui.graphics.Color
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.GeoPoint
-import com.google.firebase.firestore.Query
 import com.mobdeve.s12.group8.glimpse.model.Post
 import com.mobdeve.s12.group8.glimpse.model.Reaction
 import com.mobdeve.s12.group8.glimpse.model.User
@@ -45,7 +33,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
     private var isLiked = false
 
     @SuppressLint("ClickableViewAccessibility")
-    fun bind(documentId: String, post: Post, user: User, currUserUID: String, reactions: ArrayList<Reaction>) {
+    fun bind(documentId: String, post: Post, user: User, currUserUID: String, currUserReactedPostsID: List<String>) {
         CoroutineScope(Dispatchers.Main).launch {
             // check if user is owner of post
             if (currUserUID != post.userId) {
@@ -53,9 +41,8 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                 isLiked = false
                 binding.heartBtn.isEnabled = true
                 binding.heartBtn.setImageResource(R.drawable.heart_icon_outline)
-
-                for (reaction in reactions) {
-                    if (reaction.postId == documentId) {
+                for (reactedPostID in currUserReactedPostsID) {
+                    if (reactedPostID == documentId) {
                         isLiked = true
                         binding.heartBtn.setImageResource(R.drawable.heart_icon_filled)
                         break
