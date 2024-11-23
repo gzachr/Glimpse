@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
@@ -20,13 +21,22 @@ class FeedActivity : AppCompatActivity() {
     private lateinit var binding: ActivityFeedBinding
     private lateinit var recyclerView: RecyclerView
     private var helper = LinearSnapHelper()
-    private var isLiked = false
+    private lateinit var adapter: FeedAdapter
     private val PREFS_NAME = "MyPrefs"
     private val TOAST_SHOWN_KEY = "toastShown"
 
+    private val newIntentActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val postID = result.data?.getStringExtra(IntentKeys.POST_ID.toString())
+            if (postID != null) {
+                scrollToPost(postID) // Scroll to the chosen post
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        usernameFilter = intent.getStringExtra("filterUsername") ?: "none"
+        usernameFilter = intent.getStringExtra(IntentKeys.USERNAME_FILTER.toString()) ?: "none"
 
         binding = ActivityFeedBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -51,7 +61,7 @@ class FeedActivity : AppCompatActivity() {
                     binding.noPostsTextView.visibility = View.VISIBLE
                 } else {
                     binding.noPostsTextView.visibility = View.GONE
-                    val adapter = FeedAdapter(options)
+                    adapter = FeedAdapter(options)
                     recyclerView.adapter = adapter
                     adapter.startListening()
                 }
@@ -98,9 +108,11 @@ class FeedActivity : AppCompatActivity() {
 
         }
 
-        binding.feedViewAllBtn.setOnClickListener {
-            val intent = Intent(this, GalleryActivity::class.java)
-            startActivity(intent)
+        binding.feedGalleryBtn.setOnClickListener {
+            val intent = Intent(this, GalleryActivity::class.java).apply {
+                putExtra(IntentKeys.USERNAME_FILTER.toString(), usernameFilter)
+            }
+            newIntentActivity.launch(intent)
         }
 
         binding.feedProfileBtn.setOnClickListener {
@@ -108,14 +120,12 @@ class FeedActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        binding.feedMessageBtn.setOnClickListener {
+        binding.feedNotificationsBtn.setOnClickListener {
             val intent = Intent(this, ReactionActivity::class.java)
             startActivity(intent)
         }
 
         binding.feedReturnToHomeBtn.setOnClickListener {
-            val resultIntent = Intent()
-            setResult(RESULT_OK, resultIntent)
             finish()
         }
 
@@ -123,5 +133,20 @@ class FeedActivity : AppCompatActivity() {
             val intent = Intent(applicationContext, FriendsListActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun scrollToPost(postID: String) {
+        for (position in 0 until adapter.itemCount) {
+            val snapshot = adapter.snapshots.getSnapshot(position)
+            if (snapshot.id == postID) {
+                (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(position, 0)
+                break
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adapter.stopListening()
     }
 }

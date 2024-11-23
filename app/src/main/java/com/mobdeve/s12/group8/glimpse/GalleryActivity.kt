@@ -6,57 +6,74 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityGalleryBinding
 import OldPost
+import android.util.Log
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.firestore.Query
 import com.mobdeve.s12.group8.glimpse.model.OldReaction
+import com.mobdeve.s12.group8.glimpse.model.Post
 
 class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener {
+    private lateinit var usernameFilter: String
+    private lateinit var postsQuery: Query
     private lateinit var binding: ActivityGalleryBinding
-    private var oldPosts: ArrayList<OldPost> = ArrayList()
-    private var filteredOldPosts: ArrayList<OldPost> = ArrayList()
-    private var oldReactions: ArrayList<OldReaction> = ArrayList()
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: GalleryAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        usernameFilter = intent.getStringExtra(IntentKeys.USERNAME_FILTER.toString()) ?: "none"
+
         binding = ActivityGalleryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        recyclerView = binding.recyclerViewPosts
 
-
-
-        oldPosts = intent.getParcelableArrayListExtra<OldPost>("data") ?: ArrayList()
-        oldReactions = intent.getParcelableArrayListExtra<OldReaction>("reactions") ?: ArrayList()
-        val usernameFilter = intent.getStringExtra("galleryFilter") ?: "none"
-        filteredOldPosts = ArrayList(oldPosts.filter { it.username == usernameFilter })
-
-        binding.recyclerViewPosts.layoutManager = GridLayoutManager(this, 3)
-
-        if (usernameFilter == "none") {
-            binding.recyclerViewPosts.adapter = GalleryAdapter(oldPosts, this)
+        if (usernameFilter != "none") {
+            postsQuery= FirestoreReferences.getPostCollectionReference()
+                .whereEqualTo("userId", usernameFilter)
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
         } else {
-            if (filteredOldPosts.isNotEmpty()) {
-                binding.recyclerViewPosts.adapter = GalleryAdapter(filteredOldPosts, this)
-            } else {
-                binding.noPostsGalleryTextView.visibility = View.VISIBLE
-            }
+            postsQuery= FirestoreReferences.getPostCollectionReference()
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
         }
-        binding.reactionExitButton.setOnClickListener {
+
+        val options = FirestoreRecyclerOptions.Builder<Post>()
+            .setQuery(postsQuery, Post::class.java)
+            .build()
+
+        postsQuery.get()
+            .addOnSuccessListener { querySnapshot ->
+                if (querySnapshot.isEmpty) {
+                    binding.noPostsGalleryTextView.visibility = View.VISIBLE
+                } else {
+                    binding.noPostsGalleryTextView.visibility = View.GONE
+                    adapter = GalleryAdapter(options, this)
+                    binding.recyclerViewPosts.adapter = adapter
+                    adapter.startListening()
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FirestoreQuery", "Error retrieving posts: ${exception.message}")
+            }
+
+        recyclerView.layoutManager = GridLayoutManager(this, 3)
+
+        binding.galleryProfileButton.setOnClickListener {
             val intent = Intent(applicationContext, ProfileActivity::class.java)
             startActivity(intent)
         }
-        binding.galleryMessageBtn.setOnClickListener {
-            val newIntent = Intent(this, ReactionActivity::class.java).apply {
-                putParcelableArrayListExtra("data", oldPosts)
-                putParcelableArrayListExtra("reactions", oldReactions)
-            }
-            startActivity(newIntent)
+
+        binding.galleryNotificationsBtn.setOnClickListener {
+            val intent = Intent(this, ReactionActivity::class.java)
+            startActivity(intent)
         }
 
         binding.galleryReturnToHomeBtn.setOnClickListener {
             val resultIntent = Intent(applicationContext, HomeActivity::class.java).apply {
-                putParcelableArrayListExtra("updated_posts", oldPosts)
-                putParcelableArrayListExtra("updated_reactions", oldReactions)
-                putExtra("fromGallery", 1)
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
+
             setResult(RESULT_OK, resultIntent)
             startActivity(resultIntent)
             finish()
@@ -64,16 +81,20 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
 
         binding.galleryFriendsBtn.setOnClickListener {
             val intent = Intent(applicationContext, FriendsListActivity::class.java)
-            intent.putExtra("data", oldPosts)
             startActivity(intent)
         }
     }
 
-    override fun onPostClick(position: Int) {
-        val newIntent = Intent().apply {
-            putExtra("position", position)
+    override fun onPostClick(postID: String) {
+        val intent = Intent().apply {
+            putExtra(IntentKeys.POST_ID.toString(), postID)
         }
-        setResult(RESULT_OK, newIntent)
+        setResult(RESULT_OK, intent)
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adapter.stopListening()
     }
 }
