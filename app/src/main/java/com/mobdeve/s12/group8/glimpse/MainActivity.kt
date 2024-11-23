@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val CAMERA_PERMISSION_REQUEST_CODE = 100
+        const val LOCATION_PERMISSION_REQUEST_CODE = 200
     }
 
 
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         checkCameraPermission()
+        checkLocationPermission()
 
         if(auth.currentUser != null) {
             // navigate to main activity already
@@ -82,7 +84,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkLocationPermission(){
-
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            requestLocationPermission()
+        }
     }
 
     private fun requestCameraPermission() {
@@ -90,11 +95,21 @@ class MainActivity : AppCompatActivity() {
             CAMERA_PERMISSION_REQUEST_CODE)
     }
 
+    private fun requestLocationPermission() {
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE
+        )
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Camera permission is required to use this application.", Toast.LENGTH_LONG).show()
+            }
+        }
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Location permission is necessary to use this application.", Toast.LENGTH_LONG).show()
             }
         }
     }
