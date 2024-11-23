@@ -1,6 +1,5 @@
 package com.mobdeve.s12.group8.glimpse
 
-import OldPost
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
@@ -18,18 +17,14 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityHomeBinding
-import com.mobdeve.s12.group8.glimpse.model.OldReaction
 import java.io.File
 
 class HomeActivity: AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var gestureDetector: GestureDetector
-    private var posts = DataHelper.loadPostData()
-    private var reactions = DataHelper.loadReactionData()
     private var lensFacing: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-    private var firstToast = false
-    private val REQUEST_CODE_FEED = 1
     private var imageCapture: ImageCapture? = null
+    private var toastHint = false
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,35 +32,28 @@ class HomeActivity: AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (!firstToast) {
+        if (!toastHint) {
             Toast.makeText(this, "Double-tap to switch camera!", Toast.LENGTH_LONG).show()
-            firstToast = true
+            toastHint = true
         }
 
         binding.viewFeedBtn.setOnClickListener {
-            val intent = Intent(applicationContext, FeedActivity::class.java).apply {
-                putExtra("data", posts)
-                putExtra("reactions", reactions)
-            }
-            startActivityForResult(intent, REQUEST_CODE_FEED)  // Use startActivityForResult
-
+            val intent = Intent(applicationContext, FeedActivity::class.java)
+            startActivity(intent)
         }
 
-        binding.postExitBtn.setOnClickListener {
+        binding.postProfileBtn.setOnClickListener {
             val intent = Intent(applicationContext, ProfileActivity::class.java)
             startActivity(intent)
         }
 
         binding.notificationBtn.setOnClickListener {
             val intent = Intent(applicationContext, ReactionActivity::class.java)
-            intent.putExtra("data", posts)
-            intent.putExtra("reactions", reactions)
             startActivity(intent)
         }
 
         binding.friendsBtn.setOnClickListener {
             val intent = Intent(applicationContext, FriendsListActivity::class.java)
-            intent.putExtra("data", posts)
             startActivity(intent)
         }
 
@@ -157,61 +145,5 @@ class HomeActivity: AppCompatActivity() {
             CameraSelector.DEFAULT_FRONT_CAMERA
         }
         startCamera() // Restart the camera with the new lensFacing
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_CODE_FEED && resultCode == RESULT_OK) {
-            val updatedPosts = data?.getParcelableArrayListExtra<OldPost>("updated_posts")
-            updatedPosts?.let {
-                posts.clear()
-                posts.addAll(it)
-
-            }
-
-            val updatedRequests = data?.getParcelableArrayListExtra<OldReaction>("updated_reactions")
-            updatedRequests?.let{
-                reactions.clear()
-                reactions.addAll(it)
-            }
-        }
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        val checkFilter = intent.getStringExtra("usernameFilter") ?: "none"
-        val checkFromGallery = intent.getIntExtra("fromGallery", -1)
-
-        intent.let {
-            val updatedPosts = it.getParcelableArrayListExtra<OldPost>("updated_posts")
-            updatedPosts?.let { newPosts ->
-                posts.clear()
-                posts.addAll(newPosts)
-            }
-            val updatedReactions = it.getParcelableArrayListExtra<OldReaction>("updated_reactions")
-            updatedReactions?.let { newReactions ->
-                reactions.clear()
-                reactions.addAll(newReactions)
-            }
-        }
-
-        if (checkFromGallery == -1) {
-            intent.let {
-                val position = it.getIntExtra("open_feed_at_position", -1)
-                val feedIntent = Intent(applicationContext, FeedActivity::class.java).apply {
-                    putExtra("data", posts)
-                    putExtra("reactions", reactions)
-                    if (position != -1) {
-                        putExtra("position", position)
-                    }
-                    if (checkFilter != "none") {
-                        val filterUsername = it.getStringExtra("usernameFilter")
-                        putExtra("filterUsername", filterUsername)
-                    }
-                }
-                startActivityForResult(feedIntent, REQUEST_CODE_FEED)
-            }
-        }
     }
 }
