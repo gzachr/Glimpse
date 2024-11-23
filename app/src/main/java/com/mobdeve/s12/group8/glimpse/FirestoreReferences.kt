@@ -32,6 +32,7 @@ class FirestoreReferences {
 
         const val USERNAME_FIELD = "username"
         const val EMAIL_FIELD = "email"
+        const val PROFILE_IMAGE_URL_FIELD = "profileImageUrl"
 
         fun getFirestoreInstance() : FirebaseFirestore{
             if(db == null)
@@ -102,6 +103,16 @@ class FirestoreReferences {
             getStorageInstance().child(path).putBytes(data).await()
 
             return getStorageInstance().child(path).downloadUrl
+        }
+
+        suspend fun uploadProfileImage(userId: String, data: ByteArray): Task<Uri> {
+            val path = "profile_imgs/${userId}/profile.jpg" // Fixed path for user profile image
+            getStorageInstance().child(path).putBytes(data).await()
+            return getStorageInstance().child(path).downloadUrl
+        }
+
+        fun updateProfileImageUrl(userId: String, imageUrl: String): Task<Void> {
+            return getUserCollectionReference().document(userId).update(PROFILE_IMAGE_URL_FIELD, imageUrl)
         }
 
         fun updateUser(userId: String, updates: Map<String, Any>): Task<Void> {

@@ -44,25 +44,35 @@ class ProfileActivity : AppCompatActivity() {
                     if (!userSnapshot.isEmpty) {
                         val userDocument = userSnapshot.documents[0]
                         val username = userDocument.getString(FirestoreReferences.USERNAME_FIELD)
+                        val profileImageUrl = userDocument.getString(FirestoreReferences.PROFILE_IMAGE_URL_FIELD)
 
                         // Update UI
                         binding.profileName.text = username
                         binding.profileEmail.text = email
+
+                        // Check for custom profile image
+                        if (!profileImageUrl.isNullOrEmpty()) {
+                            // Load custom profile image
+                            Glide.with(this@ProfileActivity)
+                                .load(profileImageUrl)
+                                .apply(RequestOptions().transform(RoundedCorners(1000)))
+                                .into(binding.profileImage)
+                        } else {
+                            // Load default profile image
+                            FirestoreReferences.getDefaultUserPhoto()
+                                .addOnSuccessListener { uri ->
+                                    Glide.with(this@ProfileActivity)
+                                        .load(uri)
+                                        .apply(RequestOptions().transform(RoundedCorners(1000)))
+                                        .into(binding.profileImage)
+                                }
+                                .addOnFailureListener { exception ->
+                                    Log.e("ProfileActivity", "Failed to load default user photo: $exception")
+                                }
+                        }
                     } else {
                         Log.e("ProfileActivity", "User not found with email: $email")
                     }
-
-                    //Default Image
-                    FirestoreReferences.getDefaultUserPhoto()
-                        .addOnSuccessListener { uri ->
-                            Glide.with(this@ProfileActivity)
-                                .load(uri)
-                                .apply(RequestOptions().transform(RoundedCorners(1000)))
-                                .into(binding.profileImage)
-                        }
-                        .addOnFailureListener { exception ->
-                            Log.e("ProfileActivity", "Failed to load default user photo: $exception")
-                        }
                 } catch (e: Exception) {
                     Log.e("ProfileActivity", "Error fetching user data: $e")
                 }

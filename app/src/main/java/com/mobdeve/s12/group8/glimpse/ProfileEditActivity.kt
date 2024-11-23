@@ -1,8 +1,12 @@
 package com.mobdeve.s12.group8.glimpse
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
@@ -10,8 +14,6 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityProfileEditBinding
-import com.mobdeve.s12.group8.glimpse.model.User
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,18 +21,25 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 class ProfileEditActivity : AppCompatActivity() {
-    private lateinit var binding : ActivityProfileEditBinding
+    private lateinit var binding: ActivityProfileEditBinding
     private lateinit var auth: FirebaseAuth
+    companion object {
+        private const val REQUEST_IMAGE_PICK = 1001
+    }
+
+    private var selectedImageUri: Uri? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.profileEditExitButton.setOnClickListener{
-            finish()
-        }
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
+
+        binding.profileEditExitButton.setOnClickListener {
+            finish()
+        }
 
         // Fetch and display the current username
         CoroutineScope(Dispatchers.Main).launch {
@@ -41,7 +50,14 @@ class ProfileEditActivity : AppCompatActivity() {
                     if (!userSnapshot.isEmpty) {
                         val userDoc = userSnapshot.documents[0]
                         val currentUsername = userDoc.getString(FirestoreReferences.USERNAME_FIELD)
+                        val currentProfileImageUrl = userDoc.getString(FirestoreReferences.PROFILE_IMAGE_URL_FIELD)
+
+                        // Display current username and profile image
                         binding.editUsername.setText(currentUsername)
+                        Glide.with(this@ProfileEditActivity)
+                            .load(currentProfileImageUrl ?: R.drawable.user1)
+                            .apply(RequestOptions().transform(RoundedCorners(1000)))
+                            .into(binding.currentProfileImage)
                     }
                 }
             } catch (e: Exception) {
@@ -49,79 +65,63 @@ class ProfileEditActivity : AppCompatActivity() {
             }
         }
 
-        // Handle Save button click
+
         binding.profileEditSaveButton.setOnClickListener {
             val newUsername = binding.editUsername.text.toString().trim()
             val newPassword = binding.usernameEt.text.toString().trim()
 
-            // Validate input
-            if (newUsername.isEmpty() && newPassword.isEmpty()) {
-                Toast.makeText(
-                    this,
-                    "Please fill out at least one field to update",
-                    Toast.LENGTH_SHORT
-                ).show()
+            if (newUsername.isEmpty() && newPassword.isEmpty() && selectedImageUri == null) {
+                Toast.makeText(this, "Please update at least one field.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
-
             }
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val email = currentUser?.email
+                    val email = auth.currentUser?.email
                     if (email != null) {
-                        // Update in Firestore
-                        if (newUsername.isNotEmpty()) {
-                            val userSnapshot = FirestoreReferences.getUserByEmail(email).await()
+                        val userSnapshot = FirestoreReferences.getUserByEmail(email).await()
+                        if (!userSnapshot.isEmpty) {
                             val userDoc = userSnapshot.documents[0]
                             val userId = userDoc.id
-                            FirestoreReferences.updateUser(
-                                userId, mapOf(FirestoreReferences.USERNAME_FIELD to newUsername)
-                            ).await()
 
-                            // Show Toast for successful username update
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(
-                                    this@ProfileEditActivity,
-                                    "Username updated successfully",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                            // Update username
+                            if (newUsername.isNotEmpty()) {
+                                FirestoreReferences.updateUser(userId, mapOf(FirestoreReferences.USERNAME_FIELD to newUsername)).await()
                             }
 
-                        }
+                            // Update password
+                            if (newPassword.isNotEmpty()) {
+                                auth.currentUser?.updatePassword(newPassword)?.await()
+                            }
 
-                        // Update password in Firebase Auth directly
-                        if (newPassword.isNotEmpty()) {
-                            currentUser.updatePassword(newPassword)
-                                .addOnCompleteListener { updatePasswordTask ->
-                                    if (updatePasswordTask.isSuccessful) {
-                                        Toast.makeText(
-                                            this@ProfileEditActivity,
-                                            "Password updated successfully",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-
-                                    } else {
-                                        Toast.makeText(
-                                            this@ProfileEditActivity,
-                                            "Failed to update password: ${updatePasswordTask.exception?.message}",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                    }
+                            // Upload profile image if selected
+                            selectedImageUri?.let { uri ->
+                                val imageData = contentResolver.openInputStream(uri)?.readBytes()
+                                imageData?.let {
+                                    val downloadUrl = FirestoreReferences.uploadProfileImage(userId, it).await()
+                                    FirestoreReferences.updateProfileImageUrl(userId, downloadUrl.toString()).await()
                                 }
+                            }
+
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(this@ProfileEditActivity, "Profile updated successfully.", Toast.LENGTH_SHORT).show()
+                                finish()
+                            }
                         }
-                        finish()
                     }
                 } catch (e: Exception) {
-                    Log.e("EditActivity", "Error updating details: $e")
+                    Log.e("ProfileEditActivity", "Error updating profile: $e")
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            this@ProfileEditActivity,
-                            "Failed to update details: $e",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Toast.makeText(this@ProfileEditActivity, "Failed to update profile.", Toast.LENGTH_LONG).show()
                     }
                 }
             }
+        }
+
+        binding.profileEditImage.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            startActivityForResult(intent, REQUEST_IMAGE_PICK)
         }
         Glide.with(this)
             .load(R.drawable.user1)
@@ -133,6 +133,47 @@ class ProfileEditActivity : AppCompatActivity() {
             .apply(RequestOptions()
                 .transform(CircleCrop()))
             .into(binding.profileEditImage)
+    }
+
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                selectedImageUri = result.data?.data
+                if (selectedImageUri != null) {
+                    updateProfileImagePreview(selectedImageUri!!)
+                } else {
+                    Log.e("EditActivity", "No image selected or URI is null.")
+                }
+            }
+        }
+
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        galleryLauncher.launch(intent)
+    }
+
+    private fun updateProfileImagePreview(imageUri: Uri) {
+        // Update the profile image preview
+        Glide.with(this)
+            .load(imageUri)
+            .apply(RequestOptions().transform(CircleCrop()))
+            .into(binding.currentProfileImage)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK && data != null) {
+            val uri = data.data
+            binding.currentProfileImage.setImageURI(uri) // Display the selected image
+            uri?.let {
+                selectedImageUri = it
+            }
+        }
+        Glide.with(this)
+            .load(selectedImageUri)
+            .apply(RequestOptions().transform(CircleCrop()))
+            .into(binding.currentProfileImage)
 
     }
 }
