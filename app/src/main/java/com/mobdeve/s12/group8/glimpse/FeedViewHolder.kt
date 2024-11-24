@@ -77,6 +77,10 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                 .apply(RequestOptions().transform(RoundedCorners(16)))
                 .into(binding.feedPostIv)
 
+            if (user.username?.length!! > 11) {
+                user.username = user.username!!.substring(0, 6) + "..."
+            }
+
             binding.feedUsernameTv.text = user.username
             binding.feedCreatedAtTv.text = formatTimestampToRelative(post.createdAt)
             binding.feedCaptionTv.text = post.caption

@@ -27,6 +27,7 @@ class FeedActivity : AppCompatActivity() {
     private lateinit var currUserUID: String
     private lateinit var userIDFilter: String
     private var postID: String? = null
+    private var username: String? = null
     private lateinit var postsQuery: Query
     private lateinit var binding: ActivityFeedBinding
     private lateinit var recyclerView: RecyclerView
@@ -150,23 +151,26 @@ class FeedActivity : AppCompatActivity() {
             }
         }
 
+        CoroutineScope(Dispatchers.Main).launch {
+            if (userIDFilter == "Everyone") {
+                username = getUsername("KIAeAe6VPsLWJiYWfq8Y")
+            } else {
+                username = getUsername(userIDFilter)
+            }
+            binding.noPostsTextView.text = "No posts yet from $username"
+        }
+
         postsQuery.get()
             .addOnSuccessListener { querySnapshot ->
                 if (querySnapshot.isEmpty) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        if (userIDFilter == "Everyone"){
-                            getUsername("KIAeAe6VPsLWJiYWfq8Y")
-                        } else {
-                            getUsername(userIDFilter)
-                        }
-                    }
+                    binding.noPostsTextView.visibility = View.VISIBLE
                 } else {
                     val options = FirestoreRecyclerOptions.Builder<Post>()
                         .setQuery(postsQuery, Post::class.java)
                         .build()
 
                     binding.noPostsTextView.visibility = View.GONE
-                    adapter = FeedAdapter(options)
+                    adapter = FeedAdapter(options, binding.noPostsTextView)
                     recyclerView.adapter = adapter
                     adapter.startListening()
 
@@ -183,11 +187,9 @@ class FeedActivity : AppCompatActivity() {
             }
     }
 
-    private suspend fun getUsername(filterUserID: String) {
+    private suspend fun getUsername(filterUserID: String): String? {
         val documentSnapshot = FirestoreReferences.getUserByID(filterUserID).await()
-        val username = documentSnapshot.toObject(User::class.java)?.username
-        binding.noPostsTextView.visibility = View.VISIBLE
-        binding.noPostsTextView.text = "No posts yet from $username"
+        return documentSnapshot.toObject(User::class.java)?.username
     }
 
     private fun scrollToPost(postID: String) {

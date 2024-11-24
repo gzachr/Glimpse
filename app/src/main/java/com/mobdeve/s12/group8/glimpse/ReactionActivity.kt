@@ -3,6 +3,7 @@ package com.mobdeve.s12.group8.glimpse
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -89,10 +90,13 @@ class ReactionActivity: AppCompatActivity(), ReactionAdapter.OnNotificationsClic
                             reaction.postId to postsWithIds.firstOrNull { it.postId == reaction.postId }?.post?.imgUri
                         }
 
+                        if (reactions.isEmpty()) {
+                            binding.noNotificationsYet.visibility = View.VISIBLE
+                        }
+
                         adapter = ReactionAdapter(reactions, postReactionsMap, this)
                         recyclerView.adapter = adapter
                     }
             }
     }
-
 }

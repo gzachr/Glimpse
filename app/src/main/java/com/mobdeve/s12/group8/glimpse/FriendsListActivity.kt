@@ -17,7 +17,7 @@ import kotlinx.coroutines.tasks.await
 
 class FriendsListActivity : AppCompatActivity(), FriendsListAdapter.OnFriendClickListener {
     private lateinit var auth: FirebaseAuth
-    private lateinit var Everyone: User
+    private lateinit var everyone: User
     private lateinit var currUser: User
     private lateinit var currUserUID: String
     private lateinit var binding: ActivityFriendsListBinding
@@ -61,7 +61,7 @@ class FriendsListActivity : AppCompatActivity(), FriendsListAdapter.OnFriendClic
 
     private fun fetchFriends() {
         CoroutineScope(Dispatchers.Main).launch {
-            Everyone = FirestoreReferences.getUserByID("KIAeAe6VPsLWJiYWfq8Y").await().toObject(User::class.java)!!
+            everyone = FirestoreReferences.getUserByID("KIAeAe6VPsLWJiYWfq8Y").await().toObject(User::class.java)!!
             if (currUser.friendList.isNotEmpty()) {
                 FirestoreReferences.getUserCollectionReference()
                     .whereIn(FieldPath.documentId(), currUser.friendList)
@@ -70,7 +70,7 @@ class FriendsListActivity : AppCompatActivity(), FriendsListAdapter.OnFriendClic
                     .addOnSuccessListener { querySnapshot ->
                         val friendsList = querySnapshot.toObjects(User::class.java).toMutableList()
                         friendsList.sortBy { it.username?.lowercase() }
-                        friendsList.add(0, Everyone)
+                        friendsList.add(0, everyone)
                         friendsList.add(currUser)
                         setupAdapter(friendsList)
                     }
@@ -85,7 +85,11 @@ class FriendsListActivity : AppCompatActivity(), FriendsListAdapter.OnFriendClic
 
     private fun setupAdapter(friendsList: MutableList<User>) {
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = FriendsListAdapter(friendsList, currUserUID, currUser.username!!, this)
+        adapter = FriendsListAdapter(friendsList, currUserUID, currUser.username!!, this, this)
         recyclerView.adapter = adapter
+    }
+
+    fun checkEmptyFriendsList(size: Int) {
+        binding.noFriendsYet.visibility = if (size == 1) View.VISIBLE else View.GONE
     }
 }
