@@ -13,6 +13,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityProfileEditBinding
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -71,10 +72,12 @@ class ProfileEditActivity : AppCompatActivity() {
             val newUsername = binding.editUsername.text.toString().trim()
             val newPassword = binding.usernameEt.text.toString().trim()
 
-            if (newUsername.isEmpty() && newPassword.isEmpty() && selectedImageUri == null) {
-                Toast.makeText(this, "Please update at least one field.", Toast.LENGTH_SHORT).show()
+            if (newPassword.isNotEmpty() && newPassword.length < 6) {
+                Toast.makeText(this, "Password should be minimum 6 characters!", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
+
+            var passwordUpdateSuccessful = true
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
@@ -90,12 +93,15 @@ class ProfileEditActivity : AppCompatActivity() {
                             }
 
                             if (newPassword.isNotEmpty()) {
+                                val passwordUpdateDeferred = CompletableDeferred<Boolean>()
+
                                 currentUser?.updatePassword(newPassword)
                                     ?.addOnCompleteListener { updatePasswordTask ->
                                         CoroutineScope(Dispatchers.Main).launch {
                                             if (updatePasswordTask.isSuccessful) {
                                                 try {
                                                     FirestoreReferences.updateUserPassword(userId, newPassword).await()
+                                                    passwordUpdateDeferred.complete(true)
                                                     Toast.makeText(
                                                         this@ProfileEditActivity,
                                                         "Password updated successfully",
@@ -108,6 +114,7 @@ class ProfileEditActivity : AppCompatActivity() {
                                                         "Password updated in Firebase, but failed to update Firestore.",
                                                         Toast.LENGTH_LONG
                                                     ).show()
+                                                    passwordUpdateDeferred.complete(false)
                                                 }
                                             } else {
                                                 Toast.makeText(
@@ -115,9 +122,20 @@ class ProfileEditActivity : AppCompatActivity() {
                                                     "Failed to update password: ${updatePasswordTask.exception?.message}",
                                                     Toast.LENGTH_LONG
                                                 ).show()
+                                                passwordUpdateDeferred.complete(false)
                                             }
                                         }
                                     }
+
+                                passwordUpdateSuccessful = passwordUpdateDeferred.await()
+                            }
+
+                            // If password update fails, stop further profile updates
+                            if (!passwordUpdateSuccessful) {
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(this@ProfileEditActivity, "Profile update failed due to password error.", Toast.LENGTH_LONG).show()
+                                }
+                                return@launch
                             }
 
                             selectedImageUri?.let { uri ->
@@ -143,6 +161,7 @@ class ProfileEditActivity : AppCompatActivity() {
                 }
             }
         }
+
 
         binding.profileEditImage.setOnClickListener {
             showImageSourceDialog()
