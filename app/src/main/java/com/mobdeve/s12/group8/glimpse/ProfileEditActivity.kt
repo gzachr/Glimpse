@@ -92,18 +92,30 @@ class ProfileEditActivity : AppCompatActivity() {
                             if (newPassword.isNotEmpty()) {
                                 currentUser?.updatePassword(newPassword)
                                     ?.addOnCompleteListener { updatePasswordTask ->
-                                        if (updatePasswordTask.isSuccessful) {
-                                            Toast.makeText(
-                                                this@ProfileEditActivity,
-                                                "Password updated successfully",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        } else {
-                                            Toast.makeText(
-                                                this@ProfileEditActivity,
-                                                "Failed to update password: ${updatePasswordTask.exception?.message}",
-                                                Toast.LENGTH_LONG
-                                            ).show()
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            if (updatePasswordTask.isSuccessful) {
+                                                try {
+                                                    FirestoreReferences.updateUserPassword(userId, newPassword).await()
+                                                    Toast.makeText(
+                                                        this@ProfileEditActivity,
+                                                        "Password updated successfully",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                } catch (e: Exception) {
+                                                    Log.e("ProfileEditActivity", "Failed to update password in Firestore: $e")
+                                                    Toast.makeText(
+                                                        this@ProfileEditActivity,
+                                                        "Password updated in Firebase, but failed to update Firestore.",
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+                                                }
+                                            } else {
+                                                Toast.makeText(
+                                                    this@ProfileEditActivity,
+                                                    "Failed to update password: ${updatePasswordTask.exception?.message}",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            }
                                         }
                                     }
                             }
@@ -153,7 +165,7 @@ class ProfileEditActivity : AppCompatActivity() {
         builder.setTitle("Update Profile Picture")
         builder.setItems(options) { _, which ->
             when (which) {
-                0 -> openCamera() 
+                0 -> openCamera()
                 1 -> openGallery()
             }
         }

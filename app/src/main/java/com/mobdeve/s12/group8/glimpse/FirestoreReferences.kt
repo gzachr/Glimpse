@@ -33,6 +33,7 @@ class FirestoreReferences {
         const val USERNAME_FIELD = "username"
         const val EMAIL_FIELD = "email"
         const val PROFILE_IMAGE_URL_FIELD = "profileImage"
+        const val PASSWORD_FIELD = "password"
 
         fun getFirestoreInstance() : FirebaseFirestore{
             if(db == null)
@@ -113,6 +114,10 @@ class FirestoreReferences {
 
         fun updateProfileImageUrl(userId: String, imageUrl: String): Task<Void> {
             return getUserCollectionReference().document(userId).update(PROFILE_IMAGE_URL_FIELD, imageUrl)
+        }
+
+        fun updateUserPassword(userId: String, newPassword: String): Task<Void> {
+            return getUserCollectionReference().document(userId).update(PASSWORD_FIELD, newPassword)
         }
 
         fun updateUser(userId: String, updates: Map<String, Any>): Task<Void> {
