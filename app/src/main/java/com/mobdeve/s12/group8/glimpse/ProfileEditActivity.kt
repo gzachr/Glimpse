@@ -77,10 +77,20 @@ class ProfileEditActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            var passwordUpdateSuccessful = true
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
+                    val usernameDoc = FirestoreReferences.getUserByUsername(newUsername).await()
+
+                    if (!usernameDoc.isEmpty) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(this@ProfileEditActivity, "Username Taken", Toast.LENGTH_LONG).show()
+                        }
+                        return@launch
+                    }
+
+                    var passwordUpdateSuccessful = true
+
                     val email = auth.currentUser?.email
                     if (email != null) {
                         val userSnapshot = FirestoreReferences.getUserByEmail(email).await()
@@ -130,14 +140,13 @@ class ProfileEditActivity : AppCompatActivity() {
                                 passwordUpdateSuccessful = passwordUpdateDeferred.await()
                             }
 
-                            // If password update fails, stop further profile updates
                             if (!passwordUpdateSuccessful) {
                                 withContext(Dispatchers.Main) {
                                     Toast.makeText(this@ProfileEditActivity, "Profile update failed due to password error.", Toast.LENGTH_LONG).show()
                                 }
                                 return@launch
                             }
-
+                            
                             selectedImageUri?.let { uri ->
                                 val imageData = contentResolver.openInputStream(uri)?.readBytes()
                                 imageData?.let {
