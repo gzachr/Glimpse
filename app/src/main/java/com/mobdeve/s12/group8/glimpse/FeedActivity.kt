@@ -1,5 +1,6 @@
 package com.mobdeve.s12.group8.glimpse
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -156,6 +157,14 @@ class FeedActivity : AppCompatActivity() {
                 username = getUsername("KIAeAe6VPsLWJiYWfq8Y")
             } else {
                 username = getUsername(userIDFilter)
+                binding.feedFriendsBtn.text = username
+
+                if (username?.length!! > 5) {
+                    binding.feedFriendsBtn.compoundDrawablePadding = dpToPx(-40, this@FeedActivity)
+                }
+                if (username?.length!! > 9){
+                    binding.feedFriendsBtn.compoundDrawablePadding = dpToPx(-30, this@FeedActivity)
+                }
             }
             binding.noPostsTextView.text = "No posts yet from $username"
         }
@@ -200,5 +209,9 @@ class FeedActivity : AppCompatActivity() {
                 break
             }
         }
+    }
+
+    private fun dpToPx(dp: Int, context: Context): Int {
+        return (dp * context.resources.displayMetrics.density).toInt()
     }
 }
