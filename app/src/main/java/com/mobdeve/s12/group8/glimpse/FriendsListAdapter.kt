@@ -1,6 +1,6 @@
 package com.mobdeve.s12.group8.glimpse
 
-import android.util.Log
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,12 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.mobdeve.s12.group8.glimpse.databinding.ItemFriendsBinding
-import com.mobdeve.s12.group8.glimpse.model.Post
 import com.mobdeve.s12.group8.glimpse.model.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +20,8 @@ class FriendsListAdapter(
     private val friends: MutableList<User>,
     private val currUserUID: String,
     private val currUserUsername: String,
-    private val listener: OnFriendClickListener
+    private val listener: OnFriendClickListener,
+    private val context: Context
 ) : RecyclerView.Adapter<FriendsListAdapter.FriendsViewHolder>() {
 
     interface OnFriendClickListener {
@@ -92,5 +89,12 @@ class FriendsListAdapter(
         val index = friends.indexOf(user)
         friends.removeAt(index)
         notifyItemRemoved(index)
+
+        if (friends.size == 2) {
+            friends.removeFirst()
+            notifyItemRemoved(0)
+
+            (context as? FriendsListActivity)?.checkEmptyFriendsList(friends.size)
+        }
     }
 }

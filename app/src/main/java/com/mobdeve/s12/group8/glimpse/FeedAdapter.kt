@@ -1,6 +1,7 @@
 package com.mobdeve.s12.group8.glimpse
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
@@ -14,7 +15,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-class FeedAdapter(options: FirestoreRecyclerOptions<Post>): FirestoreRecyclerAdapter<Post, FeedViewHolder>(options) {
+class FeedAdapter(
+    options: FirestoreRecyclerOptions<Post>,
+    private val noPostsTextView: View
+): FirestoreRecyclerAdapter<Post, FeedViewHolder>(options) {
     private lateinit var auth: FirebaseAuth
     private var currUserUID: String? = null
 
@@ -53,6 +57,14 @@ class FeedAdapter(options: FirestoreRecyclerOptions<Post>): FirestoreRecyclerAda
             holder.bind(documentId, model, user!!, currUserUID!!, currUserReactedPostsID)
             holder.setDeleteButtonListener(documentId)
             holder.setReactButtonListener(documentId, currUserUID!!, model.userId)
+        }
+    }
+
+    override fun onDataChanged() {
+        if (itemCount == 0) {
+            noPostsTextView.visibility = View.VISIBLE
+        } else {
+            noPostsTextView.visibility = View.GONE
         }
     }
 }
