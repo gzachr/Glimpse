@@ -37,7 +37,6 @@ class ProfileActivity : AppCompatActivity() {
         val email = auth.currentUser?.email
 
         if (email != null) {
-            binding.profileDetailsCl.visibility = View.INVISIBLE
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     val userSnapshot = FirestoreReferences.getUserByEmail(email).await()
@@ -74,9 +73,6 @@ class ProfileActivity : AppCompatActivity() {
                     }
                 } catch (e: Exception) {
                     Log.e("ProfileActivity", "Error fetching user data: $e")
-                }
-                finally {
-                    binding.profileDetailsCl.visibility = View.VISIBLE
                 }
             }
         } else {

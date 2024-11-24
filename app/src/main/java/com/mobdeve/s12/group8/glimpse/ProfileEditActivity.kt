@@ -55,7 +55,6 @@ class ProfileEditActivity : AppCompatActivity() {
                         val currentUsername = userDoc.getString(FirestoreReferences.USERNAME_FIELD)
                         val currentProfileImageUrl = userDoc.getString(FirestoreReferences.PROFILE_IMAGE_URL_FIELD)
 
-                        // Display current username and profile image
                         binding.editUsername.setText(currentUsername)
                         Glide.with(this@ProfileEditActivity)
                             .load(currentProfileImageUrl ?: R.drawable.user1)
@@ -146,7 +145,7 @@ class ProfileEditActivity : AppCompatActivity() {
                                 }
                                 return@launch
                             }
-                            
+
                             selectedImageUri?.let { uri ->
                                 val imageData = contentResolver.openInputStream(uri)?.readBytes()
                                 imageData?.let {
