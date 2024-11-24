@@ -10,19 +10,14 @@ import androidx.core.content.ContextCompat
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityMainBinding
 import android.Manifest
 import androidx.core.app.ActivityCompat
-import com.google.firebase.Firebase
-import com.google.firebase.FirebaseApp
-import com.google.firebase.firestore.firestore
 import com.google.firebase.auth.FirebaseAuth
-import com.mobdeve.s12.group8.glimpse.model.User
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var auth: FirebaseAuth
 
     companion object {
-        const val CAMERA_PERMISSION_REQUEST_CODE = 100
-        const val LOCATION_PERMISSION_REQUEST_CODE = 200
+        const val PERMISSION_REQUEST_CODE = 200
     }
 
 
@@ -37,8 +32,7 @@ class MainActivity : AppCompatActivity() {
             apply()
         }
 
-        checkCameraPermission()
-        checkLocationPermission()
+        checkPermissions()
 
         if(auth.currentUser != null) {
             // navigate to main activity already
@@ -76,40 +70,30 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun checkCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            != PackageManager.PERMISSION_GRANTED) {
-            requestCameraPermission()
+    private fun checkPermissions() {
+        val permissionsNeeded = mutableListOf<String>()
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            permissionsNeeded.add(Manifest.permission.CAMERA)
         }
-    }
-
-    private fun checkLocationPermission(){
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            requestLocationPermission()
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION)
         }
-    }
-
-    private fun requestCameraPermission() {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA),
-            CAMERA_PERMISSION_REQUEST_CODE)
-    }
-
-    private fun requestLocationPermission() {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE
-        )
+        if (permissionsNeeded.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, permissionsNeeded.toTypedArray(), PERMISSION_REQUEST_CODE)
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Camera permission is required to use this application.", Toast.LENGTH_LONG).show()
-            }
-        }
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Location permission is necessary to use this application.", Toast.LENGTH_LONG).show()
+        for (i in permissions.indices) {
+            if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                val message = when (permissions[i]) {
+                    Manifest.permission.CAMERA -> "Camera permission is necessary to use this application."
+                    Manifest.permission.ACCESS_FINE_LOCATION -> "Location permission is necessary to use this application."
+                    else -> "Permission denied."
+                }
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
             }
         }
     }
