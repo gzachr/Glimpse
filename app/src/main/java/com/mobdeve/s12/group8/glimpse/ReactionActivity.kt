@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldPath
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityReactionsBinding
 import com.mobdeve.s12.group8.glimpse.model.Post
 import com.mobdeve.s12.group8.glimpse.model.Reaction
@@ -69,26 +70,20 @@ class ReactionActivity: AppCompatActivity(), ReactionAdapter.OnNotificationsClic
     }
 
     private fun fetchReactions() {
-        FirestoreReferences.getPostCollectionReference()
-            .whereEqualTo("userId", currUserUID)
+        FirestoreReferences.getReactionCollectionReference()
+            .whereIn(FieldPath.documentId(), currUser.reactionsReceived)
+            .orderBy("timeReacted", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .get()
-            .addOnSuccessListener { querySnapshot ->
-                val postsWithIds = querySnapshot.documents.mapNotNull { document ->
-                    val post = document.toObject(Post::class.java)
-                    if (post != null) PostWithId(document.id, post) else null
-                }
+            .addOnSuccessListener { reactionSnapshot ->
+                reactions = reactionSnapshot.toObjects(Reaction::class.java)
+                val postIDList = reactions.map { it.postId }.distinct()
 
-                val postIDs = postsWithIds.map { it.postId }
-
-                FirestoreReferences.getReactionCollectionReference()
-                    .whereIn("postId", postIDs)
+                FirestoreReferences.getPostCollectionReference()
+                    .whereIn(FieldPath.documentId(), postIDList)
                     .get()
-                    .addOnSuccessListener { reactionSnapshot ->
-                        reactions = reactionSnapshot.toObjects(Reaction::class.java)
-
-                        val postReactionsMap = reactions.associate { reaction ->
-                            reaction.postId to postsWithIds.firstOrNull { it.postId == reaction.postId }?.post?.imgUri
-                        }
+                    .addOnSuccessListener { postSnapshot ->
+                        val postIdToImgUriMap = postSnapshot.documents.associate { it.id to it.toObject(Post::class.java)?.imgUri }
+                        val postReactionsMap = reactions.associate { it.postId to postIdToImgUriMap[it.postId]!! }
 
                         if (reactions.isEmpty()) {
                             binding.noNotificationsYet.visibility = View.VISIBLE

@@ -1,5 +1,6 @@
 package com.mobdeve.s12.group8.glimpse
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +28,7 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
     private lateinit var binding: ActivityGalleryBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: GalleryAdapter
+    private var username: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,16 +98,27 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
             }
         }
 
+        CoroutineScope(Dispatchers.Main).launch {
+            if (userIDFilter == "Everyone") {
+                username = getUsername("KIAeAe6VPsLWJiYWfq8Y")
+            } else {
+                username = getUsername(userIDFilter)
+                binding.galleryFriendsBtn.text = username
+
+                if (username?.length!! > 5) {
+                    binding.galleryFriendsBtn.compoundDrawablePadding = dpToPx(-40, this@GalleryActivity)
+                }
+                if (username?.length!! > 9){
+                    binding.galleryFriendsBtn.compoundDrawablePadding = dpToPx(-30, this@GalleryActivity)
+                }
+            }
+            binding.noPostsGalleryTextView.text = "No posts yet from $username"
+        }
+
         postsQuery.get()
             .addOnSuccessListener { querySnapshot ->
                 if (querySnapshot.isEmpty) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        if (userIDFilter == "Everyone"){
-                            getUsername("KIAeAe6VPsLWJiYWfq8Y")
-                        } else {
-                            getUsername(userIDFilter)
-                        }
-                    }
+                    binding.noPostsGalleryTextView.visibility = View.VISIBLE
                 } else {
                     val options = FirestoreRecyclerOptions.Builder<Post>()
                         .setQuery(postsQuery, Post::class.java)
@@ -122,11 +135,9 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
             }
     }
 
-    private suspend fun getUsername(filterUserID: String) {
+    private suspend fun getUsername(filterUserID: String): String? {
         val documentSnapshot = FirestoreReferences.getUserByID(filterUserID).await()
-        val username = documentSnapshot.toObject(User::class.java)?.username
-        binding.noPostsGalleryTextView.visibility = View.VISIBLE
-        binding.noPostsGalleryTextView.text = "No posts yet from $username"
+        return documentSnapshot.toObject(User::class.java)?.username
     }
 
     override fun onPostClick(postID: String) {
@@ -135,5 +146,9 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
         }
         setResult(RESULT_OK, intent)
         finish()
+    }
+
+    private fun dpToPx(dp: Int, context: Context): Int {
+        return (dp * context.resources.displayMetrics.density).toInt()
     }
 }
