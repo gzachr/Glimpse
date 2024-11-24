@@ -96,8 +96,20 @@ class ProfileEditActivity : AppCompatActivity() {
                         if (!userSnapshot.isEmpty) {
                             val userDoc = userSnapshot.documents[0]
                             val userId = userDoc.id
+                            val currentUsername = userDoc.getString(FirestoreReferences.USERNAME_FIELD)
+                            
+                            if (newUsername.isNotEmpty() && newUsername != currentUsername) {
+                                val usernameDoc = FirestoreReferences.getUserByUsername(newUsername).await()
 
-                            if (newUsername.isNotEmpty()) {
+                                if (!usernameDoc.isEmpty) {
+                                    withContext(Dispatchers.Main) {
+                                        Toast.makeText(this@ProfileEditActivity, "Username Taken", Toast.LENGTH_LONG).show()
+                                    }
+                                    return@launch
+                                }
+                            }
+
+                            if (newUsername.isNotEmpty() && newUsername != currentUsername) {
                                 FirestoreReferences.updateUser(userId, mapOf(FirestoreReferences.USERNAME_FIELD to newUsername)).await()
                             }
 
