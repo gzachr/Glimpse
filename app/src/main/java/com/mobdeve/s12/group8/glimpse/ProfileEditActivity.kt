@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
@@ -19,16 +18,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class ProfileEditActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileEditBinding
     private lateinit var auth: FirebaseAuth
-    private var isImageSelected: Boolean = false
+    private var selectedImageUri: Uri? = null
+    private var cameraImageUri: Uri? = null
+    private var isImageSelected = false
+
     companion object {
         private const val REQUEST_IMAGE_PICK = 1001
+        private const val REQUEST_IMAGE_CAPTURE = 1002
     }
-
-    private var selectedImageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +44,6 @@ class ProfileEditActivity : AppCompatActivity() {
             finish()
         }
 
-        // Fetch and display the current username
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val email = currentUser?.email
@@ -66,7 +67,6 @@ class ProfileEditActivity : AppCompatActivity() {
             }
         }
 
-
         binding.profileEditSaveButton.setOnClickListener {
             val newUsername = binding.editUsername.text.toString().trim()
             val newPassword = binding.usernameEt.text.toString().trim()
@@ -85,17 +85,29 @@ class ProfileEditActivity : AppCompatActivity() {
                             val userDoc = userSnapshot.documents[0]
                             val userId = userDoc.id
 
-                            // Update username
                             if (newUsername.isNotEmpty()) {
                                 FirestoreReferences.updateUser(userId, mapOf(FirestoreReferences.USERNAME_FIELD to newUsername)).await()
                             }
 
-                            // Update password
                             if (newPassword.isNotEmpty()) {
-                                auth.currentUser?.updatePassword(newPassword)?.await()
+                                currentUser?.updatePassword(newPassword)
+                                    ?.addOnCompleteListener { updatePasswordTask ->
+                                        if (updatePasswordTask.isSuccessful) {
+                                            Toast.makeText(
+                                                this@ProfileEditActivity,
+                                                "Password updated successfully",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            Toast.makeText(
+                                                this@ProfileEditActivity,
+                                                "Failed to update password: ${updatePasswordTask.exception?.message}",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    }
                             }
 
-                            // Upload profile image if selected
                             selectedImageUri?.let { uri ->
                                 val imageData = contentResolver.openInputStream(uri)?.readBytes()
                                 imageData?.let {
@@ -121,10 +133,9 @@ class ProfileEditActivity : AppCompatActivity() {
         }
 
         binding.profileEditImage.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            startActivityForResult(intent, REQUEST_IMAGE_PICK)
+            showImageSourceDialog()
         }
+
         Glide.with(this)
             .load(R.drawable.user1)
             .apply(RequestOptions().transform(CircleCrop()))
@@ -132,30 +143,62 @@ class ProfileEditActivity : AppCompatActivity() {
 
         Glide.with(this)
             .load(R.drawable.upload_profile_photo)
-            .apply(RequestOptions()
-                .transform(CircleCrop()))
+            .apply(RequestOptions().transform(CircleCrop()))
             .into(binding.profileEditImage)
     }
 
-    private val galleryLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                selectedImageUri = result.data?.data
-                if (selectedImageUri != null) {
-                    updateProfileImagePreview(selectedImageUri!!)
-                } else {
-                    Log.e("EditActivity", "No image selected or URI is null.")
-                }
+    private fun showImageSourceDialog() {
+        val options = arrayOf("Take Photo", "Choose from Gallery")
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setTitle("Update Profile Picture")
+        builder.setItems(options) { _, which ->
+            when (which) {
+                0 -> openCamera() 
+                1 -> openGallery()
             }
         }
+        builder.show()
+    }
+
+    private fun openCamera() {
+        val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+        val imageFile = createImageFile()
+        cameraImageUri = Uri.fromFile(imageFile)
+        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, cameraImageUri)
+        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+    }
+
+    private fun createImageFile(): File {
+        val storageDir = externalCacheDir
+        return File.createTempFile("profile_", ".jpg", storageDir)
+    }
 
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        galleryLauncher.launch(intent)
+        intent.type = "image/*"
+        startActivityForResult(intent, REQUEST_IMAGE_PICK)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_IMAGE_PICK -> {
+                    selectedImageUri = data?.data
+                    selectedImageUri?.let { updateProfileImagePreview(it) }
+                }
+                REQUEST_IMAGE_CAPTURE -> {
+                    cameraImageUri?.let {
+                        selectedImageUri = it
+                        updateProfileImagePreview(it)
+                    }
+                }
+            }
+        }
     }
 
     private fun updateProfileImagePreview(imageUri: Uri) {
-        // Update the profile image preview
         isImageSelected = true
         Glide.with(this)
             .load(imageUri)
@@ -163,27 +206,9 @@ class ProfileEditActivity : AppCompatActivity() {
             .into(binding.currentProfileImage)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK && data != null) {
-            val uri = data.data
-            binding.currentProfileImage.setImageURI(uri) // Display the selected image
-            uri?.let {
-                selectedImageUri = it
-                isImageSelected = true
-            }
-        }
-        Glide.with(this)
-            .load(selectedImageUri)
-            .apply(RequestOptions().transform(CircleCrop()))
-            .into(binding.currentProfileImage)
-
-    }
     override fun onResume() {
         super.onResume()
 
-        // Only refresh data if no tentative image is selected
         if (!isImageSelected) {
             val currentUser = auth.currentUser
             if (currentUser != null) {
@@ -197,10 +222,7 @@ class ProfileEditActivity : AppCompatActivity() {
                                 val currentUsername = userDoc.getString(FirestoreReferences.USERNAME_FIELD)
                                 val currentProfileImageUrl = userDoc.getString(FirestoreReferences.PROFILE_IMAGE_URL_FIELD)
 
-                                // Update username in EditText
                                 binding.editUsername.setText(currentUsername)
-
-                                // Load profile image (custom or default)
                                 Glide.with(this@ProfileEditActivity)
                                     .load(currentProfileImageUrl ?: R.drawable.user1)
                                     .apply(RequestOptions().transform(CircleCrop()))

@@ -32,7 +32,7 @@ class FirestoreReferences {
 
         const val USERNAME_FIELD = "username"
         const val EMAIL_FIELD = "email"
-        const val PROFILE_IMAGE_URL_FIELD = "profileImageUrl"
+        const val PROFILE_IMAGE_URL_FIELD = "profileImage"
 
         fun getFirestoreInstance() : FirebaseFirestore{
             if(db == null)
