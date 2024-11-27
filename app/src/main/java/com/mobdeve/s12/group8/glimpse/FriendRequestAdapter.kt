@@ -25,7 +25,7 @@ class FriendRequestAdapter(
         fun bind(user: User, userID: String) {
             Glide.with(binding.requestImage.context)
                 .load(user.profileImage)
-                .apply(RequestOptions().transform(RoundedCorners(50)))
+                .apply(RequestOptions().transform(RoundedCorners(100)))
                 .into(binding.requestImage)
 
             binding.requestUsername.text = user.username

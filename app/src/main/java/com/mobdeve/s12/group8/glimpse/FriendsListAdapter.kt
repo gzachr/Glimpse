@@ -36,7 +36,7 @@ class FriendsListAdapter(
 
             Glide.with(binding.friendImage.context)
                 .load(user.profileImage)
-                .apply(RequestOptions().transform(RoundedCorners(50)))
+                .apply(RequestOptions().transform(RoundedCorners(100)))
                 .into(binding.friendImage)
 
             binding.friendUsername.text = if (user.username == currUserUsername) "You" else user.username
