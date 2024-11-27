@@ -3,10 +3,8 @@ package com.mobdeve.s12.group8.glimpse
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
@@ -14,7 +12,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.Query
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityFriendRequestBinding
-import com.mobdeve.s12.group8.glimpse.databinding.ActivityFriendsListBinding
 import com.mobdeve.s12.group8.glimpse.model.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +39,12 @@ class FriendRequestActivity : AppCompatActivity() {
 
         binding.friendRequestExitBtn.setOnClickListener {
             val intent = Intent(this, FriendsListActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        onBackPressedDispatcher.addCallback(this) {
+            val intent = Intent(this@FriendRequestActivity, FriendsListActivity::class.java)
             startActivity(intent)
             finish()
         }
@@ -77,5 +80,4 @@ class FriendRequestActivity : AppCompatActivity() {
             }
         }
     }
-
 }
