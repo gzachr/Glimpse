@@ -3,11 +3,13 @@ package com.mobdeve.s12.group8.glimpse
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FieldValue
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityFriendsListBinding
 import com.mobdeve.s12.group8.glimpse.model.User
 import kotlinx.coroutines.CoroutineScope
@@ -43,6 +45,39 @@ class FriendsListActivity : AppCompatActivity(), FriendsListAdapter.OnFriendClic
                     }
                 }
             }
+        }
+
+        binding.addNewFriendBt.setOnClickListener {
+            val username = binding.addEt.text.toString()
+
+            if (username != "") {
+                FirestoreReferences.getUserByUsername(username)
+                    .addOnSuccessListener { querySnapshot ->
+                        val userDocSnapshot = querySnapshot.documents.firstOrNull()
+                        if (userDocSnapshot != null) {
+                            userDocSnapshot.get("friendRequestList")?.let { currentRequests ->
+                                if ((currentRequests as? List<String>)?.contains(currUserUID) == true) {
+                                    Toast.makeText(this, "Friend Request to user was already sent", Toast.LENGTH_LONG).show()
+                                } else {
+                                    userDocSnapshot.reference.update(
+                                        "friendRequestList", FieldValue.arrayUnion(currUserUID)
+                                    )
+                                    Toast.makeText(this, "Friend Request Sent", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }  else {
+                            Toast.makeText(this, "No user exists with that username", Toast.LENGTH_LONG).show()
+                        }
+                    }
+            } else {
+                Toast.makeText(this, "Please place a username in the field", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        binding.friendRequestBtn.setOnClickListener {
+            val intent = Intent(this, FriendRequestActivity::class.java)
+            startActivity(intent)
+            finish()
         }
 
         binding.friendsExitButton.setOnClickListener {
