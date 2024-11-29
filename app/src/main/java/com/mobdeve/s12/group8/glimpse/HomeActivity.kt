@@ -19,6 +19,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityHomeBinding
 import java.io.File
+import kotlin.math.ceil
 
 class HomeActivity: AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
@@ -47,6 +48,7 @@ class HomeActivity: AppCompatActivity() {
         if(screenHeight < 2160) {
             layoutParams1.setMargins(0,20,0,0)
             layoutParams2.setMargins(0, 20, 0, 0)
+
         }
 
         binding.viewFeedBtn.setOnClickListener {
