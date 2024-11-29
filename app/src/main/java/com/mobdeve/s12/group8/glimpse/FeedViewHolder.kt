@@ -1,6 +1,7 @@
 package com.mobdeve.s12.group8.glimpse
 
 import android.annotation.SuppressLint
+import android.content.res.Resources
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -10,6 +11,8 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
 import android.util.Log
+import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
@@ -26,6 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import kotlin.math.ceil
 
 class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding.root) {
     private var stateFlag: Boolean = false
@@ -64,11 +68,18 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                     .into(binding.feedUserIv)
             }
 
+            val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+
             // set height = to width so that image will show up as square
             binding.feedCv.post {
-                val width = binding.feedCv.width
+                //resize based on screen height
+                var width = binding.feedCv.width
+                if(screenHeight < 2160)
+                    width = ceil(width*.8).toInt()
+
                 val layoutParams = binding.feedCv.layoutParams
                 layoutParams.height = width
+                layoutParams.width = width
                 binding.feedCv.layoutParams = layoutParams
             }
 
