@@ -11,7 +11,9 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
 import android.util.Log
+import android.view.View.INVISIBLE
 import android.view.ViewGroup
+import androidx.compose.runtime.traceEventEnd
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -35,6 +37,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
     private var stateFlag: Boolean = false
     private var mapFragment: SupportMapFragment? = null
     private var isLiked = false
+    private var tempWidth: Int = 0
 
     @SuppressLint("ClickableViewAccessibility")
     fun bind(documentId: String, post: Post, user: User, currUserUID: String, currUserReactedPostsID: List<String>) {
@@ -73,13 +76,17 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
             // set height = to width so that image will show up as square
             binding.feedCv.post {
                 //resize based on screen height
-                var width = binding.feedCv.width
-                if(screenHeight < 2160)
-                    width = ceil(width*.8).toInt()
-
+                val width = binding.feedCv.width
+                if(tempWidth == 0)
+                    tempWidth = width
                 val layoutParams = binding.feedCv.layoutParams
-                layoutParams.height = width
-                layoutParams.width = width
+                if(screenHeight < 2160) {
+                    layoutParams.height = ceil(tempWidth*.8).toInt()
+                    layoutParams.width = ceil(tempWidth*.8).toInt()
+                } else {
+                    layoutParams.height = tempWidth
+                    layoutParams.width = tempWidth
+                }
                 binding.feedCv.layoutParams = layoutParams
             }
 
@@ -94,7 +101,12 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
 
             binding.feedUsernameTv.text = user.username
             binding.feedCreatedAtTv.text = formatTimestampToRelative(post.createdAt)
+
+
             binding.feedCaptionTv.text = post.caption
+
+            if(post.caption == "")
+                binding.feedCaptionTv.visibility = INVISIBLE
 
             //on double tap change to location view
             val gestureDetector =
