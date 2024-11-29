@@ -11,6 +11,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.mobdeve.s12.group8.glimpse.model.Post
+import com.mobdeve.s12.group8.glimpse.model.Reaction
 import com.mobdeve.s12.group8.glimpse.model.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,8 @@ class FirestoreReferences {
 
         const val USERNAME_FIELD = "username"
         const val EMAIL_FIELD = "email"
+        const val PROFILE_IMAGE_URL_FIELD = "profileImage"
+        const val PASSWORD_FIELD = "password"
 
         fun getFirestoreInstance() : FirebaseFirestore{
             if(db == null)
@@ -75,6 +78,10 @@ class FirestoreReferences {
             return getPostCollectionReference().add(post)
         }
 
+        fun addReaction(reaction: Reaction): Task<DocumentReference> {
+            return getReactionCollectionReference().add(reaction)
+        }
+
         fun getUserByUsername(username: String): Task<QuerySnapshot> {
             return getUserCollectionReference().whereEqualTo(USERNAME_FIELD, username).get()
         }
@@ -97,6 +104,24 @@ class FirestoreReferences {
             getStorageInstance().child(path).putBytes(data).await()
 
             return getStorageInstance().child(path).downloadUrl
+        }
+
+        suspend fun uploadProfileImage(userId: String, data: ByteArray): Task<Uri> {
+            val path = "profile_imgs/${userId}/profile.jpg" // Fixed path for user profile image
+            getStorageInstance().child(path).putBytes(data).await()
+            return getStorageInstance().child(path).downloadUrl
+        }
+
+        fun updateProfileImageUrl(userId: String, imageUrl: String): Task<Void> {
+            return getUserCollectionReference().document(userId).update(PROFILE_IMAGE_URL_FIELD, imageUrl)
+        }
+
+        fun updateUserPassword(userId: String, newPassword: String): Task<Void> {
+            return getUserCollectionReference().document(userId).update(PASSWORD_FIELD, newPassword)
+        }
+
+        fun updateUser(userId: String, updates: Map<String, Any>): Task<Void> {
+            return getUserCollectionReference().document(userId).update(updates)
         }
     }
 }

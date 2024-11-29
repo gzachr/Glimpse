@@ -1,62 +1,75 @@
 package com.mobdeve.s12.group8.glimpse
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.mobdeve.s12.group8.glimpse.databinding.ActivityGalleryBinding
-import OldPost
+import android.util.Log
 import android.view.View
-import com.mobdeve.s12.group8.glimpse.model.OldReaction
+import androidx.recyclerview.widget.RecyclerView
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.Query
+import com.mobdeve.s12.group8.glimpse.model.Post
+import com.mobdeve.s12.group8.glimpse.model.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener {
+    private lateinit var auth: FirebaseAuth
+    private lateinit var currUser: User
+    private lateinit var currUserUID: String
+    private lateinit var userIDFilter: String
+    private lateinit var postsQuery: Query
     private lateinit var binding: ActivityGalleryBinding
-    private var oldPosts: ArrayList<OldPost> = ArrayList()
-    private var filteredOldPosts: ArrayList<OldPost> = ArrayList()
-    private var oldReactions: ArrayList<OldReaction> = ArrayList()
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: GalleryAdapter
+    private var username: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        userIDFilter = intent.getStringExtra(IntentKeys.USER_ID_FILTER.toString()) ?: "Everyone"
+
         binding = ActivityGalleryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        recyclerView = binding.recyclerViewPosts
 
-
-
-        oldPosts = intent.getParcelableArrayListExtra<OldPost>("data") ?: ArrayList()
-        oldReactions = intent.getParcelableArrayListExtra<OldReaction>("reactions") ?: ArrayList()
-        val usernameFilter = intent.getStringExtra("galleryFilter") ?: "none"
-        filteredOldPosts = ArrayList(oldPosts.filter { it.username == usernameFilter })
-
-        binding.recyclerViewPosts.layoutManager = GridLayoutManager(this, 3)
-
-        if (usernameFilter == "none") {
-            binding.recyclerViewPosts.adapter = GalleryAdapter(oldPosts, this)
-        } else {
-            if (filteredOldPosts.isNotEmpty()) {
-                binding.recyclerViewPosts.adapter = GalleryAdapter(filteredOldPosts, this)
-            } else {
-                binding.noPostsGalleryTextView.visibility = View.VISIBLE
+        auth = FirebaseAuth.getInstance()
+        CoroutineScope(Dispatchers.Main).launch {
+            auth.currentUser?.let { firebaseUser ->
+                val query = FirestoreReferences.getUserByEmail(firebaseUser.email!!)
+                query.addOnSuccessListener { querySnapshot ->
+                    val userDocument = querySnapshot.documents.firstOrNull()
+                    userDocument?.let {
+                        currUser = it.toObject(User::class.java)!!
+                        currUserUID = it.id
+                        fetchPosts()
+                    }
+                }
             }
         }
-        binding.reactionExitButton.setOnClickListener {
+
+        recyclerView.layoutManager = GridLayoutManager(this, 3)
+
+        binding.galleryProfileButton.setOnClickListener {
             val intent = Intent(applicationContext, ProfileActivity::class.java)
             startActivity(intent)
         }
-        binding.galleryMessageBtn.setOnClickListener {
-            val newIntent = Intent(this, ReactionActivity::class.java).apply {
-                putParcelableArrayListExtra("data", oldPosts)
-                putParcelableArrayListExtra("reactions", oldReactions)
-            }
-            startActivity(newIntent)
+
+        binding.galleryNotificationsBtn.setOnClickListener {
+            val intent = Intent(this, ReactionActivity::class.java)
+            startActivity(intent)
         }
 
         binding.galleryReturnToHomeBtn.setOnClickListener {
             val resultIntent = Intent(applicationContext, HomeActivity::class.java).apply {
-                putParcelableArrayListExtra("updated_posts", oldPosts)
-                putParcelableArrayListExtra("updated_reactions", oldReactions)
-                putExtra("fromGallery", 1)
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
+
             setResult(RESULT_OK, resultIntent)
             startActivity(resultIntent)
             finish()
@@ -64,16 +77,78 @@ class GalleryActivity : AppCompatActivity(), GalleryAdapter.OnPostClickListener 
 
         binding.galleryFriendsBtn.setOnClickListener {
             val intent = Intent(applicationContext, FriendsListActivity::class.java)
-            intent.putExtra("data", oldPosts)
             startActivity(intent)
         }
     }
 
-    override fun onPostClick(position: Int) {
-        val newIntent = Intent().apply {
-            putExtra("position", position)
+    private fun fetchPosts() {
+        currUser.friendList += currUserUID
+        if (userIDFilter != "Everyone") {
+            postsQuery= FirestoreReferences.getPostCollectionReference()
+                .whereEqualTo("userId", userIDFilter)
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+        } else {
+            if (currUser.friendList.isNotEmpty()) {
+                postsQuery= FirestoreReferences.getPostCollectionReference()
+                    .whereIn("userId", currUser.friendList)
+                    .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            } else {
+                postsQuery = FirestoreReferences.getPostCollectionReference()
+                    .whereEqualTo("nonExistentField", "nonExistentValue")
+            }
         }
-        setResult(RESULT_OK, newIntent)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            if (userIDFilter == "Everyone") {
+                username = getUsername("KIAeAe6VPsLWJiYWfq8Y")
+            } else {
+                username = getUsername(userIDFilter)
+                binding.galleryFriendsBtn.text = username
+
+                if (username?.length!! > 5) {
+                    binding.galleryFriendsBtn.compoundDrawablePadding = dpToPx(-40, this@GalleryActivity)
+                }
+                if (username?.length!! > 9){
+                    binding.galleryFriendsBtn.compoundDrawablePadding = dpToPx(-30, this@GalleryActivity)
+                }
+            }
+            binding.noPostsGalleryTextView.text = "No posts yet from $username"
+        }
+
+        postsQuery.get()
+            .addOnSuccessListener { querySnapshot ->
+                if (querySnapshot.isEmpty) {
+                    binding.noPostsGalleryTextView.visibility = View.VISIBLE
+                } else {
+                    val options = FirestoreRecyclerOptions.Builder<Post>()
+                        .setQuery(postsQuery, Post::class.java)
+                        .build()
+
+                    binding.noPostsGalleryTextView.visibility = View.GONE
+                    adapter = GalleryAdapter(options, this)
+                    binding.recyclerViewPosts.adapter = adapter
+                    adapter.startListening()
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FirestoreQuery", "Error retrieving posts: ${exception.message}")
+            }
+    }
+
+    private suspend fun getUsername(filterUserID: String): String? {
+        val documentSnapshot = FirestoreReferences.getUserByID(filterUserID).await()
+        return documentSnapshot.toObject(User::class.java)?.username
+    }
+
+    override fun onPostClick(postID: String) {
+        val intent = Intent().apply {
+            putExtra(IntentKeys.POST_ID.toString(), postID)
+        }
+        setResult(RESULT_OK, intent)
         finish()
+    }
+
+    private fun dpToPx(dp: Int, context: Context): Int {
+        return (dp * context.resources.displayMetrics.density).toInt()
     }
 }

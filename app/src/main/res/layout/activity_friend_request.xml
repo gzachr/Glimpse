@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_reactions"
+    android:id="@+id/activity_friends_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -12,7 +12,7 @@
         android:background="@color/black">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/reactionsTopNavLL"
+            android:id="@+id/friendsRequestTopNavLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="5dp"
@@ -20,30 +20,29 @@
             android:paddingEnd="5dp">
 
             <ImageButton
-                android:id="@+id/reactionExitButton"
+                android:id="@+id/friendRequestExitBtn"
                 android:layout_width="65dp"
                 android:layout_height="50dp"
                 android:background="@drawable/rounded_button"
                 android:scaleType="center"
                 android:src="@drawable/exit_icon"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/notificationsTitle"
+                android:id="@+id/friendRequestTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="60dp"
                 android:fontFamily="@font/poppins_semibold"
-                android:text="Notifications"
+                android:text="Friend Requests"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/reactionExitButton"
+                app:layout_constraintStart_toEndOf="@+id/friendRequestExitBtn"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -53,21 +52,21 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/noNotificationsYet"
+                android:id="@+id/noFriendRequestYet"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/poppins_semibold"
-                android:text="You have no notifications yet."
+                android:text="You have no friend requests yet."
                 android:textColor="@color/white"
                 android:textSize="17sp"
-                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/reactionRecyclerView"
+                app:layout_constraintEnd_toEndOf="@+id/friendReqRecyclerView"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/reactionRecyclerView" />
+                app:layout_constraintTop_toTopOf="@+id/friendReqRecyclerView"
+                android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/reactionRecyclerView"
+                android:id="@+id/friendReqRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>

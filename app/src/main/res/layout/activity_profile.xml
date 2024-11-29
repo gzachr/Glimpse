@@ -59,28 +59,12 @@
                 android:layout_width="250dp"
                 android:layout_height="250dp"
                 android:layout_marginStart="80dp"
-                android:layout_marginTop="60dp"
+                android:layout_marginTop="50dp"
                 android:layout_marginEnd="80dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/user1" />
-            <TextView
-                android:id="@+id/profileNameLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="80dp"
-                android:layout_marginTop="25dp"
-                android:layout_marginEnd="80dp"
-                android:fontFamily="@font/poppins_semibold"
-                android:text="Username"
-                android:textColor="@color/white"
-                android:textSize="31sp"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profileImage" />
 
 
             <TextView
@@ -88,95 +72,77 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="80dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="80dp"
-                android:fontFamily="@font/poppins_semibold"
-                android:text="user1"
-                android:textColor="@color/white"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profileNameLabel" />
-
-
-            <TextView
-                android:id="@+id/profilePasswordLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="80dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginEnd="80dp"
                 android:fontFamily="@font/poppins_semibold"
-                android:text="Password"
+                android:text="user1"
+                android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="31sp"
+                android:textSize="25sp"
                 android:textStyle="bold"
-                android:textAlignment="viewStart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profileImage" />
+
+
+            <TextView
+                android:id="@+id/profileEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="80dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="80dp"
+                android:fontFamily="@font/poppins"
+                android:text="sample@email.com"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="italic"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/profileName" />
 
-
-            <TextView
-                android:id="@+id/profilePassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="80dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="80dp"
-                android:fontFamily="@font/poppins_semibold"
-                android:text="************"
-                android:textColor="@color/white"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profilePasswordLabel" />
-
-            <LinearLayout
-                android:id="@+id/linearLayout2"
+            <Button
+                android:id="@+id/profileEditButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="60dp"
-                android:orientation="horizontal"
+                android:layout_marginTop="70dp"
+                android:layout_marginBottom="100dp"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="@color/primary_purple"
+                android:fontFamily="@font/poppins_semibold"
+                android:paddingLeft="20dp"
+                android:paddingTop="12dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="12dp"
+                android:text="Edit Profile"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.497"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profilePassword">
-
-                <ImageButton
-                    android:id="@+id/profileEditButton"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:background="@android:color/transparent"
-                    android:scaleType="centerInside"
-                    app:srcCompat="@drawable/edit" />
-
-                <TextView
-                    android:id="@+id/profileEditLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:text="Edit Profile"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
+                app:layout_constraintTop_toBottomOf="@+id/profileEmail" />
 
             <Button
                 android:id="@+id/profileLogoutBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:text="Logut"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="30dp"
+                android:background="#00FFFFFF"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Log Out"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+                app:layout_constraintTop_toBottomOf="@+id/profileEditButton"
+                app:layout_constraintVertical_bias="0.02" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

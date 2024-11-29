@@ -4,20 +4,28 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.mobdeve.s12.group8.glimpse.databinding.ItemPostBinding
-import OldPost
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.mobdeve.s12.group8.glimpse.model.Post
 
 class GalleryAdapter(
-    private val oldPostList: ArrayList<OldPost>,
+    options: FirestoreRecyclerOptions<Post>,
     private val listener: OnPostClickListener
-) : RecyclerView.Adapter<GalleryAdapter.PostViewHolder>() {
+) : FirestoreRecyclerAdapter<Post, GalleryAdapter.PostViewHolder>(options) {
 
     interface OnPostClickListener {
-        fun onPostClick(position: Int)
+        fun onPostClick(postID: String)
     }
 
     inner class PostViewHolder(private val binding: ItemPostBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bindData(oldPost: OldPost) {
-            binding.imageViewPost.setImageResource(oldPost.postImageId)
+        fun bindData(post: Post) {
+            Glide.with(binding.imageViewPost.context)
+                .load(post.imgUri)
+                .apply(RequestOptions().transform(RoundedCorners(16)))
+                .into(binding.imageViewPost)
         }
     }
 
@@ -26,16 +34,12 @@ class GalleryAdapter(
         return PostViewHolder(binding)
     }
 
-    override fun getItemCount(): Int {
-        return oldPostList.size
-    }
-
-    override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val post = oldPostList[position]
-        holder.bindData(post)
+    override fun onBindViewHolder(holder: PostViewHolder, position: Int, model: Post) {
+        holder.bindData(model)
+        val documentId = snapshots.getSnapshot(position).id
 
         holder.itemView.setOnClickListener {
-            listener.onPostClick(post.position)
+            listener.onPostClick(documentId)
         }
     }
 
