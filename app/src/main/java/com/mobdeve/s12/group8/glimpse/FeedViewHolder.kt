@@ -12,9 +12,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.mobdeve.s12.group8.glimpse.databinding.FeedLayoutBinding
 import android.util.Log
 import android.view.View.INVISIBLE
-import android.view.ViewGroup
-import androidx.compose.runtime.traceEventEnd
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
@@ -40,8 +37,18 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
     private var tempWidth: Int = 0
 
     @SuppressLint("ClickableViewAccessibility")
-    fun bind(documentId: String, post: Post, user: User, currUserUID: String, currUserReactedPostsID: List<String>) {
+    fun bind(documentId: String, post: Post, user: User, currUserUID: String, currUserReactedPostsID: List<String>, isMapVisible: Boolean, toggleMap: (String) -> Unit) {
         CoroutineScope(Dispatchers.Main).launch {
+            // Bind map visibility based on state
+            if (isMapVisible) {
+                binding.feedPostIv.visibility = View.GONE
+                binding.mapContainer.visibility = View.VISIBLE
+                // Set up the map...
+            } else {
+                binding.feedPostIv.visibility = View.VISIBLE
+                binding.mapContainer.visibility = View.GONE
+            }
+
             // check if user is owner of post
             if (currUserUID != post.userId) {
                 binding.deleteBtn.visibility = View.GONE
@@ -109,18 +116,12 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                 binding.feedCaptionTv.visibility = INVISIBLE
 
             //on double tap change to location view
-            val gestureDetector =
-                GestureDetector(binding.root.context, object : GestureDetector.SimpleOnGestureListener() {
-                    override fun onDoubleTap(e: MotionEvent): Boolean {
-                        toggleMap(post.location)
-
-                        // Start the image change with animation
-//                    animateImageChange(binding.feedPostIv, newImage)
-//                    stateFlag = !stateFlag
-
-                        return true
-                    }
-                })
+            val gestureDetector = GestureDetector(binding.root.context, object : GestureDetector.SimpleOnGestureListener() {
+                override fun onDoubleTap(e: MotionEvent): Boolean {
+                    toggleMap(post.location) // Use the `toggleMap` function with the post's GeoPoint
+                    return true
+                }
+            })
 
 //        binding.feedCv.setOnTouchListener { _, motionEvent ->
 //            gestureDetector.onTouchEvent(motionEvent)
@@ -139,32 +140,24 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
         val fragmentManager = (binding.root.context as FragmentActivity).supportFragmentManager
 
         if (stateFlag) {
-            // Show the image and hide/remove the map fragment
             binding.feedPostIv.visibility = View.VISIBLE
             binding.mapContainer.visibility = View.GONE
 
             mapFragment?.let {
                 fragmentManager.beginTransaction().hide(it).commit()
             }
-
         } else {
             binding.feedPostIv.visibility = View.GONE
             binding.mapContainer.visibility = View.VISIBLE
-            //TODO: adjust with actual post coordinates
+
             val marker = LatLng(geoPoint.latitude, geoPoint.longitude)
 
-            // Only create a new SupportMapFragment if one doesn't exist
             if (mapFragment == null) {
                 mapFragment = SupportMapFragment.newInstance().also { fragment ->
                     fragment.getMapAsync { googleMap ->
-                        // Customize the map, add markers, etc.
-                        googleMap.addMarker(
-                            MarkerOptions()
-                                .position(marker)
-                                .title("Marker")
-                        )
-                        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker, 15.5f)
-                        googleMap.moveCamera(cameraUpdate)
+                        // Configure map settings
+                        googleMap.addMarker(MarkerOptions().position(marker).title("Marker"))
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker, 15.5f))
                         googleMap.uiSettings.setAllGesturesEnabled(false)
                     }
                     fragmentManager.beginTransaction().replace(binding.mapContainer.id, fragment)
@@ -175,7 +168,6 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                 // Show the map fragment if it already exists
                 fragmentManager.beginTransaction().show(mapFragment!!).commit()
             }
-
         }
         stateFlag = !stateFlag
     }

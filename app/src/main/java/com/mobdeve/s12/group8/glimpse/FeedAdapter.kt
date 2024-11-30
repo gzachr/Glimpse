@@ -22,6 +22,25 @@ class FeedAdapter(
     private lateinit var auth: FirebaseAuth
     private var currUserUID: String? = null
 
+    private val mapVisibleStates = mutableSetOf<String>() // Track posts by documentId
+
+    private fun toggleMapState(documentId: String) {
+        if (mapVisibleStates.contains(documentId)) {
+            mapVisibleStates.remove(documentId)
+        } else {
+            mapVisibleStates.add(documentId)
+        }
+
+        // Find the position of the document in the adapter by comparing document IDs
+        val position = (0 until snapshots.size).firstOrNull {
+            snapshots.getSnapshot(it).id == documentId
+        }
+
+        if (position != null) {
+            notifyItemChanged(position) // Notify RecyclerView to rebind the specific item
+        }
+    }
+
     init {
         CoroutineScope(Dispatchers.Main).launch {
             auth = FirebaseAuth.getInstance()
@@ -54,7 +73,10 @@ class FeedAdapter(
                 currUserReactedPostsID.add(reaction!!.postId)
             }
 
-            holder.bind(documentId, model, user!!, currUserUID!!, currUserReactedPostsID)
+            holder.bind(documentId, model, user!!, currUserUID!!, currUserReactedPostsID, mapVisibleStates.contains(documentId) ) { id ->
+                toggleMapState(id)
+            }
+
             holder.setDeleteButtonListener(documentId)
             holder.setReactButtonListener(documentId, currUserUID!!, model.userId)
         }
