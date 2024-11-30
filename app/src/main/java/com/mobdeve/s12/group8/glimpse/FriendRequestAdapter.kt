@@ -31,6 +31,13 @@ class FriendRequestAdapter(
             binding.requestUsername.text = user.username
 
             binding.acceptRequest.setOnClickListener {
+                FirestoreReferences.getUserByID(userID)
+                    .addOnSuccessListener { userDocSnapshot ->
+                        userDocSnapshot.reference.update(
+                            "friendList", FieldValue.arrayUnion(currUserUID)
+                        )
+                    }
+
                 FirestoreReferences.getUserByID(currUserUID)
                     .addOnSuccessListener { userDocSnapshot ->
                         userDocSnapshot.reference.update(
