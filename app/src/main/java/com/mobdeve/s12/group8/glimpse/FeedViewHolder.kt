@@ -40,7 +40,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
     private var tempWidth: Int = 0
 
     @SuppressLint("ClickableViewAccessibility")
-    fun bind(documentId: String, post: Post, user: User, currUserUID: String, currUserReactedPostsID: List<String>) {
+    fun bind(documentId: String, post: Post, user: User, currUserUID: String, currUserReactedPostsID: List<String>, isMapVisible: Boolean, toggleMapVisibility: () -> Unit) {
         CoroutineScope(Dispatchers.Main).launch {
             // check if user is owner of post
             if (currUserUID != post.userId) {
@@ -60,6 +60,8 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                 binding.heartBtn.isEnabled = false
                 binding.heartBtn.setImageResource(R.drawable.heart_icon_grey)
             }
+
+            updateVisibility(isMapVisible)
 
             user.let {
                 val profileImageUrl = it.profileImage
@@ -90,6 +92,19 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                 binding.feedCv.layoutParams = layoutParams
             }
 
+            if (isMapVisible && binding.mapContainer.visibility == View.VISIBLE) {
+                val fragmentManager = (binding.root.context as FragmentActivity).supportFragmentManager
+                val mapFragment = SupportMapFragment.newInstance()
+                fragmentManager.beginTransaction().replace(binding.mapContainer.id, mapFragment).commit()
+
+                mapFragment.getMapAsync { googleMap ->
+                    val marker = LatLng(post.location.latitude, post.location.longitude)
+                    googleMap.addMarker(MarkerOptions().position(marker).title("Post Location"))
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker, 15.5f))
+                    googleMap.uiSettings.setAllGesturesEnabled(false)
+                }
+            }
+
             Glide.with(binding.feedPostIv.context)
                 .load(post.imgUri)
                 .apply(RequestOptions().transform(RoundedCorners(16)))
@@ -112,11 +127,7 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
             val gestureDetector =
                 GestureDetector(binding.root.context, object : GestureDetector.SimpleOnGestureListener() {
                     override fun onDoubleTap(e: MotionEvent): Boolean {
-                        toggleMap(post.location)
-
-                        // Start the image change with animation
-//                    animateImageChange(binding.feedPostIv, newImage)
-//                    stateFlag = !stateFlag
+                        toggleMapVisibility()
 
                         return true
                     }
@@ -133,6 +144,11 @@ class FeedViewHolder(private val binding: FeedLayoutBinding): ViewHolder(binding
                 true
             }
         }
+    }
+
+    fun updateVisibility(isMapVisible: Boolean) {
+        binding.feedPostIv.visibility = if (isMapVisible) View.GONE else View.VISIBLE
+        binding.mapContainer.visibility = if (isMapVisible) View.VISIBLE else View.GONE
     }
 
     private fun toggleMap(geoPoint: GeoPoint) {

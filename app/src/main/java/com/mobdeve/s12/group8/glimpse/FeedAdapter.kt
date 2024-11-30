@@ -21,6 +21,8 @@ class FeedAdapter(
 ): FirestoreRecyclerAdapter<Post, FeedViewHolder>(options) {
     private lateinit var auth: FirebaseAuth
     private var currUserUID: String? = null
+    private val mapVisibilityState = mutableMapOf<Int, Boolean>()
+
 
     init {
         CoroutineScope(Dispatchers.Main).launch {
@@ -33,6 +35,12 @@ class FeedAdapter(
                 currUserUID = userDocument?.id
             }
         }
+    }
+
+    private fun toggleMapVisibility(position: Int) {
+        val currentState = mapVisibilityState[position] ?: false
+        mapVisibilityState[position] = !currentState
+        notifyItemChanged(position, "TOGGLE_MAP") // Rebind the item to update its UI
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
@@ -54,9 +62,21 @@ class FeedAdapter(
                 currUserReactedPostsID.add(reaction!!.postId)
             }
 
-            holder.bind(documentId, model, user!!, currUserUID!!, currUserReactedPostsID)
+            holder.bind(
+                documentId,
+                model,
+                user!!,
+                currUserUID!!,
+                currUserReactedPostsID,
+                mapVisibilityState[position] ?: false
+            ) {
+                toggleMapVisibility(
+                    position,
+                )
+            }
             holder.setDeleteButtonListener(documentId)
             holder.setReactButtonListener(documentId, currUserUID!!, model.userId)
+
         }
     }
 
