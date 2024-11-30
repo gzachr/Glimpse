@@ -3,6 +3,7 @@ package com.mobdeve.s12.group8.glimpse
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -65,6 +66,12 @@ class LoginActivity : AppCompatActivity() {
                 } catch (err: FirebaseAuthInvalidCredentialsException) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(this@LoginActivity, "Invalid Credentials", Toast.LENGTH_LONG).show()
+                    }
+                }
+                catch (err: Exception) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@LoginActivity, "Invalid Credentials", Toast.LENGTH_LONG).show()
+                        Log.e("TAG", err.toString())
                     }
                 }
             }
